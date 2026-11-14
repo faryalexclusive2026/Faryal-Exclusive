@@ -1,0 +1,24 @@
+# Faryal Exclusive
+
+> Faryal Exclusive is Pakistan's premier online shopping and lifestyle destination, offering luxury Pakistani fashion, wedding and festive collections, premium branded suits, men's and women's apparel, makeup, skincare, footwear, accessories, and home essentials.
+
+## Overview
+- **Website URL:** https://www.faryalexclusive.com
+- **Brand Name:**(Faryal Exclusive)
+- **Target Audience:** Fashion enthusiasts across Pakistan looking for luxury wear, wedding edits, and daily lifestyle essentials.
+
+## Core Categories & Collections
+- **Women & Men Clothing:** Unstitched, Ready-to-Wear, Three Piece, Two Piece, Shalwar Kameez.
+- **Seasonal & Wedding Collections:** Wedding Collection, Festive Collection, Summer Collection, Winter Collection.
+- **Beauty & Care:** Face Makeup, Eye Makeup, Lips, Nails, Cleansers, Serums, Moisturizers, Sun Protection.
+- **Accessories & Footwear:** Jewelry, Bags & Purses, Hair Accessories, Heels, Block Heels, Flats, Men Shoes.
+- **Home Essentials:** Premium Bed Sheets.
+
+## Curated Brands & Quality
+- Features high-end Pakistani designer aesthetics and premium fabrics (Chiffon, Organza, Jamawar, Addawork, and Sequence work).
+- Dedicated online shopping platform with secure ordering, fast delivery across Pakistan, and active Meta Pixel tracking.
+
+## Main Pages & Links
+- [Home Store](https://www.faryalexclusive.com/)
+- [Shopping Cart](https://www.faryalexclusive.com/cart.html)
+- [Product Catalog](https://www.faryalexclusive.com/product.html)
