@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - FARYAL EXCLUSIVE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --black: #050504; --gold: #f7a80c; --cream: #f8f4ed; --white: #fff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--cream); color: #242019; }
+        
+        header { background: var(--black); color: white; padding: 10px 4%; display: flex; align-items: center; justify-content: space-between; }
+        .brand h1 { font-family: "Playfair Display", serif; font-size: 18px; color: var(--gold); letter-spacing: 2px; }
+        .back-btn { color: var(--gold); text-decoration: none; font-size: 12px; font-weight: 600; }
+
+        .container { max-width: 900px; margin: 15px auto; background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #e7dcc8; display: flex; flex-wrap: wrap; gap: 20px; }
+        .image-section { flex: 1; min-width: 280px; }
+        
+        .main-img { width: 100%; height: clamp(250px, 38vh, 420px); object-fit: contain; background: #fdfaf5; border-radius: 6px; border: 1px solid #eee; }
+        .thumbnails { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; padding-bottom: 4px; }
+        .thumbnails img { width: 50px; height: 60px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+        .thumbnails img.active-thumb { border-color: var(--gold); }
+
+        .details-section { flex: 1; min-width: 280px; display: flex; flex-direction: column; }
+        .title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+        .brand-name { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .price { font-size: 18px; color: #8b4357; font-weight: 700; margin-bottom: 12px; }
+
+        .options-title { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+        .options-group { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+        
+        .opt-btn { padding: 6px 14px; border: 1px solid #ccc; background: transparent; color: #111; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+        .opt-btn.active { border-color: var(--black); background: var(--black); color: #fff; }
+
+        .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; transition: all 0.2s ease; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .color-swatch.active { border-color: var(--black); transform: scale(1.1); box-shadow: 0 0 0 2px var(--gold); }
+
+        .error-border { border: 1.5px solid #d32f2f !important; border-radius: 6px; padding: 4px; }
+        .error-text { color: #d32f2f; font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; margin-left: auto; }
+
+        .add-to-cart-btn { width: 100%; background: var(--black); color: var(--gold); border: 1px solid var(--gold); padding: 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+        .add-to-cart-btn:hover { background: var(--gold); color: var(--black); }
+
+        .description-box { border-top: 1px solid #eee; padding-top: 12px; margin-top: 5px; }
+        .description-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #333; }
+        .description { font-size: 12px; color: #666; line-height: 1.5; white-space: pre-line; }
+
+        /* ریلیٹڈ پروڈکٹس گریڈ - موبائل پر دو دو ایک ساتھ */
+        .products-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 0 10px !important;
+        }
+
+        @media screen and (min-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            .container { padding: 10px; margin: 8px; gap: 12px; }
+            .main-img { height: 260px; }
+            .title { font-size: 17px; }
+            .price { font-size: 16px; }
+            .add-to-cart-btn { padding: 11px; font-size: 12px; }
+        }
+
+        /* لائٹ باکس کا مکمل اسکرین اور سلائیڈر ویو */
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+        }
+        #imageModal img {
+            max-width: 85%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+        }
+        #closeModal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .modal-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid #f7a80c;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            user-select: none;
+            transition: 0.3s;
+            z-index: 10000;
+        }
+        .modal-arrow:hover {
+            background: #f7a80c;
+            color: #000;
+        }
+        #prevModalBtn { left: 25px; }
+        #nextModalBtn { right: 25px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="brand"><h1>FARYAL EXCLUSIVE</h1></div>
+         <a href="cart.html" style="color: #f7a80c; text-decoration: none; font-size: 16px; position: relative; background: #1a1815; border: 1px solid #f7a80c; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+      <i class="fa-solid fa-bag-shopping"></i>
+      <span id="cartCount" style="position: absolute; top: -5px; right: -5px; background: #8b4357; color: white; font-size: 9px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">0</span>
+     </a>
+    </header>
+
+    <div class="container" id="productContainer">
+        <p .container { max-width: 850px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e7dcc8; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }Loading product details...</p>
+    </div>
+
+    <!-- Image Lightbox Modal with Navigation Arrows -->
+    <div id="imageModal">
+        <span id="closeModal" onclick="closeImageModal()">&times;</span>
+        <div id="prevModalBtn" class="modal-arrow" onclick="changeModalImage(-1)">&#10094;</div>
+        <img id="modalImage" src="" alt="Full Screen Product Image">
+        <div id="nextModalBtn" class="modal-arrow" onclick="changeModalImage(1)">&#10095;</div>
+    </div>
+
+    <!-- Related Products Section -->
+    <section class="section" id="related-products-section" style="background:#f4ecdf; padding: 40px 20px; margin-top: 30px;">
+        <div class="heading" style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 10px; letter-spacing: 3px; color: #f77904fd; text-transform: uppercase;">You Might Also Like</span>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; margin-bottom: 8px; color: #111;">Related Products</h2>
+            <p style="font-size: 12px; color: #666; margin-top: 0;">Explore more styles from this collection.</p>
+        </div>
+        <div class="products-grid" id="related-products-grid">
+            <!-- Related products will load here dynamically -->
+        </div>
+    </section>
+
+    <!-- Reviews & Ratings Section -->
+    <section class="reviews-section" style="max-width: 900px; margin: 40px auto; padding: 20px; font-family: 'Montserrat', sans-serif;">
+      <h2 style="text-align: center; font-family: 'Playfair Display', serif; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; color: #111;">Customer Reviews</h2>
+
+      <div class="reviews-header" style="display: flex; justify-content: space-between; align-items: center; background: #fdfaf5; padding: 20px 25px; border-radius: 6px; border: 1px solid #e7dcc8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <span id="avgRatingNumber" style="font-size: 36px; font-weight: bold; color: #000;">0.0</span>
+          <div>
+            <div id="avgStars" style="color: #f7a80c; font-size: 16px; letter-spacing: 2px;">☆☆☆☆☆</div>
+            <span id="totalReviewsCount" style="font-size: 12px; color: #666;">Based on 0 reviews</span>
+          </div>
+        </div>
+        <button onclick="toggleReviewForm()" style="background: #050504; color: #f7a80c; border: 1px solid #f7a80c; padding: 10px 22px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; cursor: pointer;">
+          Write A Review
+        </button>
+      </div>
+
+      <div id="reviewFormContainer" style="display: none; background: #fff; border: 1px solid #e7dcc8; padding: 25px; margin-bottom: 30px; border-radius: 6px;">
+        <h3 style="margin-top: 0; font-size: 16px; text-transform: uppercase; color: #8b4357; margin-bottom: 15px;">Write a Review</h3>
+        <form id="reviewForm" onsubmit="submitReview(event)">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Name *</label>
+            <input type="text" id="reviewerName" required placeholder="Enter your name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px;">
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Rating *</label>
+            <div class="star-rating-select" style="font-size: 24px; color: #ccc; cursor: pointer; display: inline-block;">
+              <span class="star-btn" onclick="setRating(1)" style="margin-right: 2px;">★</span>
+              <span class="star-btn" onclick="setRating(2)" style="margin-right: 2px;">★</span>
+              <span class="star-btn" onclick="setRating(3)" style="margin-right: 2px;">★</span>
+              <span class="star-btn" onclick="setRating(4)" style="margin-right: 2px;">★</span>
+              <span class="star-btn" onclick="setRating(5)" style="margin-right: 2px;">★</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Review *</label>
+            <textarea id="reviewText" rows="3" required placeholder="Write your experience with this product..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px;"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" style="background: #8b4357; color: white; border: none; padding: 10px 20px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">Submit Review</button>
+            <button type="button" onclick="toggleReviewForm()" style="background: transparent; color: #666; border: 1px solid #ccc; padding: 10px 15px; font-size: 12px; border-radius: 4px; cursor: pointer;">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="reviewsContainer">
+        <div id="reviewsList" style="margin-top: 15px;">
+          <p style="color: #777; text-align: center; padding: 20px 0;"></p>
+        </div>
+      </div>
+    </section>
+
+    <script>
+        const SUPABASE_URL = "https://iuturwbelrhwtdijuesg.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_T9KQDQuceL5WH08Zr0GypA_7i9qPjSz";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let selectedColor = '';
+        let selectedSize = '';
+        let currentProduct = null;
+        let galleryImages = [];
+        let currentModalIndex = 0;
+
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem("faryalExclusiveCart") || "[]");
+                document.getElementById("cartCount").textContent = cart.length;
+            } catch (e) {}
+        }
+
+        async function fetchProductDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (!productId) {
+                document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product ID is missing in URL!</p>';
+                return;
+            }
+
+            await loadProductFromSupabase(productId);
+        }
+
+        async function loadProductFromSupabase(productId) {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+
+            if (error || !data) {
+                console.error("Fetch Error:", error);
+                document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product not found or failed to load.</p>';
+                return;
+            }
+
+            currentProduct = data;
+            galleryImages = [];
+            const paths = Array.isArray(data.images) ? data.images : [];
+
+            for (const path of paths) {
+                if (!path) continue;
+                let cleanPath = path.toString().trim().replace(/^\/+/, '');
+                if (cleanPath.toLowerCase().startsWith('product/')) {
+                    cleanPath = cleanPath.substring(8);
+                }
+
+                const { data: publicData } = supabaseClient
+                    .storage
+                    .from("Product")
+                    .getPublicUrl(cleanPath);
+
+                if (publicData && publicData.publicUrl) {
+                    galleryImages.push(publicData.publicUrl);
+                }
+            }
+
+            if (galleryImages.length === 0 && data.image_url) {
+                galleryImages.push(data.image_url);
+            }
+
+            renderProduct(currentProduct);
+            loadRelatedProducts(currentProduct);
+        }
+
+        function renderProduct(prod) {
+            const mainImgUrl = galleryImages[0] || 'https://via.placeholder.com/400';
+
+            let thumbsHtml = '';
+            galleryImages.forEach((img, index) => {
+                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active-thumb' : ''}" onclick="changeMainImg('${img}', this, ${index})">`;
+            });
+
+            selectedColor = "";
+            selectedSize = "";
+
+            const colorsList = prod.colors ? prod.colors.split(',').map(c => c.trim()).filter(c => c) : [];
+            let colorsHtml = '';
+            if (colorsList.length > 0) {
+                colorsList.forEach((col) => {
+                    colorsHtml += `<div class="color-swatch" style="background-color: ${col};" onclick="selectColorOption('${col}', this)" title="${col}"></div>`;
+                });
+            }
+
+            const sizesList = prod.sizes ? prod.sizes.split(',').map(s => s.trim()).filter(s => s) : [];
+            let sizesHtml = '';
+            if (sizesList.length > 0) {
+                sizesList.forEach((sz) => {
+                    sizesHtml += `<button class="opt-btn" onclick="selectSizeOption('${sz}', this)">${sz}</button>`;
+                });
+            }
+
+            document.getElementById('productContainer').innerHTML = `
+               <div class="image-section">
+                   <img src="${mainImgUrl}" id="mainImage" class="main-img" alt="Product Image" onclick="openImageModal(currentModalIndex)" style="cursor: pointer;" title="Click to view full screen">
+                   ${thumbsHtml ? `<div class="thumbnails">${thumbsHtml}</div>` : ''}
+                </div>
+                <div class="details-section">
+                    <div class="title">${prod.name || 'Luxury Product'}</div>
+                    ${prod.brand ? `<div class="brand-name">${prod.brand}</div>` : ''}
+                    <div class="price">Rs. ${Number(prod.price || 0).toLocaleString('en-PK')}</div>
+                    
+                    ${colorsHtml ? `
+                        <div class="options-title" id="colorTitleContainer">
+                            <span>Select Color:</span>
+                        </div>
+                        <div class="options-group" id="colorOptionsGroup">${colorsHtml}</div>
+                    ` : ''}
+                    
+                    ${sizesHtml ? `
+                        <div class="options-title" id="sizeTitleContainer">
+                            <span>Select Size:</span>
+                        </div>
+                        <div class="options-group" id="sizeOptionsGroup">${sizesHtml}</div>
+                    ` : ''}
+
+                    <button class="add-to-cart-btn" onclick="addToCart()">ADD TO BAG</button>
+
+                    <div class="description-box">
+                        <div class="description-title">PRODUCT DETAILS</div>
+                        <div class="description">${prod.description || 'Exclusive Pakistani designer outfit crafted with premium quality fabric.'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeMainImg(imgUrl, el, index) {
+            currentModalIndex = index;
+            document.getElementById('mainImage').src = imgUrl;
+            document.querySelectorAll('.thumbnails img').forEach(img => img.classList.remove('active-thumb'));
+            if(el) el.classList.add('active-thumb');
+        }
+
+        function openImageModal(index = 0) {
+            if (!galleryImages || galleryImages.length === 0) return;
+            currentModalIndex = index;
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            if (modal && modalImg) {
+                modal.style.display = "flex";
+                modalImg.src = galleryImages[currentModalIndex];
+            }
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+        }
+
+        function changeModalImage(direction) {
+            if (!galleryImages || galleryImages.length === 0) return;
+            currentModalIndex += direction;
+            
+            if (currentModalIndex >= galleryImages.length) {
+                currentModalIndex = 0;
+            } else if (currentModalIndex < 0) {
+                currentModalIndex = galleryImages.length - 1;
+            }
+            
+            const modalImg = document.getElementById('modalImage');
+            if (modalImg) {
+                modalImg.src = galleryImages[currentModalIndex];
+            }
+        }
+
+        function selectColorOption(color, el) {
+            selectedColor = color;
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            
+            const colorGroup = document.getElementById('colorOptionsGroup');
+            const colorTitle = document.getElementById('colorTitleContainer');
+            if (colorGroup) colorGroup.classList.remove('error-border');
+            if (colorTitle) {
+                const errSpan = colorTitle.querySelector('.error-text');
+                if (errSpan) errSpan.remove();
+            }
+        }
+
+        function selectSizeOption(size, el) {
+            selectedSize = size;
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            
+            const sizeGroup = document.getElementById('sizeOptionsGroup');
+            const sizeTitle = document.getElementById('sizeTitleContainer');
+            if (sizeGroup) sizeGroup.classList.remove('error-border');
+            if (sizeTitle) {
+                const errSpan = sizeTitle.querySelector('.error-text');
+                if (errSpan) errSpan.remove();
+            }
+        }
+
+        function addToCart() {
+            if (!currentProduct) return;
+
+            let hasError = false;
+            const hasColors = currentProduct.colors && currentProduct.colors.trim().length > 0;
+            const colorGroup = document.getElementById('colorOptionsGroup');
+            const colorTitle = document.getElementById('colorTitleContainer');
+
+            if (hasColors && !selectedColor) {
+                hasError = true;
+                if (colorGroup) colorGroup.classList.add('error-border');
+                if (colorTitle && !colorTitle.querySelector('.error-text')) {
+                    colorTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a color</span>');
+                }
+            }
+
+            const hasSizes = currentProduct.sizes && currentProduct.sizes.trim().length > 0;
+            const sizeGroup = document.getElementById('sizeOptionsGroup');
+            const sizeTitle = document.getElementById('sizeTitleContainer');
+
+            if (hasSizes && !selectedSize) {
+                hasError = true;
+                if (sizeGroup) sizeGroup.classList.add('error-border');
+                if (sizeTitle && !sizeTitle.querySelector('.error-text')) {
+                    sizeTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a size</span>');
+                }
+            }
+
+            if (hasError) return;
+
+            let cart = JSON.parse(localStorage.getItem('faryalExclusiveCart') || '[]');
+            const itemToAdd = {
+                ...currentProduct,
+                imageUrls: galleryImages,
+                selectedColor: selectedColor || 'Standard',
+                selectedSize: selectedSize || 'Standard'
+            };
+
+            cart.push(itemToAdd);
+            localStorage.setItem('faryalExclusiveCart', JSON.stringify(cart));
+            updateCartCount();
+            window.location.href = 'cart.html';
+        }
+
+        async function loadRelatedProducts(prod) {
+            const relatedGrid = document.getElementById("related-products-grid");
+            const relatedSection = document.getElementById("related-products-section");
+            if (!relatedGrid || !relatedSection) return;
+
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .neq('id', prod.id)
+                .limit(8);
+
+            if (error || !data || data.length === 0) {
+                relatedSection.style.display = "none";
+                return;
+            }
+
+            let matched = data.filter(p => (p.category || "").trim().toLowerCase() === (prod.category || "").trim().toLowerCase());
+            if (matched.length === 0) {
+                matched = data;
+            }
+
+            const displayList = matched.slice(0, 4);
+            if (displayList.length === 0) {
+                relatedSection.style.display = "none";
+                return;
+            }
+
+            relatedSection.style.display = "block";
+
+            relatedGrid.innerHTML = displayList.map(p => {
+                let imgUrl = 'https://via.placeholder.com/300';
+                try {
+                    let imgs = p.images;
+                    if (typeof imgs === 'string') {
+                        try { imgs = JSON.parse(imgs); } catch(e) { imgs = [imgs]; }
+                    }
+                    const imgsArr = Array.isArray(imgs) ? imgs : [];
+                    if (imgsArr.length > 0 && imgsArr[0]) {
+                        let cleanP = imgsArr[0].toString().trim().replace(/^\/+/, '');
+                        if (cleanP.toLowerCase().startsWith('product/')) cleanP = cleanP.substring(8);
+                        const pub = supabaseClient.storage.from("Product").getPublicUrl(cleanP);
+                        if (pub && pub.data) imgUrl = pub.data.publicUrl;
+                    } else if (p.image_url) {
+                        imgUrl = p.image_url;
+                    }
+                } catch (e) {}
+
+                return `
+                  <article class="product" onclick="window.location.href='product.html?id=${p.id}'" style="cursor: pointer; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <div class="product-image" style="height: 280px; overflow: hidden; background: #fdfaf5;">
+                      <img src="${imgUrl}" alt="${safeText(p.name)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="padding: 12px; text-align: center;">
+                      <h3 style="font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #13110e;">${safeText(p.name)}</h3>
+                      <div class="price" style="font-size: 13px; font-weight: bold; color: #8b4357;">Rs. ${Number(p.price || 0).toLocaleString("en-PK")}</div>
+                    </div>
+                  </article>
+                `;
+            }).join("");
+        }
+
+        let selectedRating = 0;
+
+        function toggleReviewForm() {
+            const formContainer = document.getElementById("reviewFormContainer");
+            if (!formContainer) return;
+            formContainer.style.display = (formContainer.style.display === "none" || !formContainer.style.display) ? "block" : "none";
+            if (formContainer.style.display === "block") {
+                formContainer.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll(".star-btn");
+            stars.forEach((star, index) => {
+                star.style.color = index < rating ? "#f7a80c" : "#ccc";
+            });
+        }
+
+        function getProductIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get("id");
+        }
+
+        async function loadReviews() {
+            const productId = getProductIdFromUrl();
+            const reviewsList = document.getElementById("reviewsList");
+            if (!productId || !reviewsList) return;
+
+            const { data, error } = await supabaseClient
+                .from("reviews")
+                .select("*")
+                .eq("product_id", productId)
+                .order("created_at", { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                document.getElementById("avgRatingNumber").textContent = "0.0";
+                document.getElementById("avgStars").innerHTML = "☆☆☆☆☆";
+                document.getElementById("totalReviewsCount").textContent = "Based on 0 reviews";
+                reviewsList.innerHTML = "<p style='color: #777; text-align: center; padding: 20px;'>No reviews yet. Be the first to review this product!</p>";
+                return;
+            }
+
+            const totalReviews = data.length;
+            const sumRatings = data.reduce((acc, r) => acc + Number(r.rating || 0), 0);
+            const avgRating = (sumRatings / totalReviews).toFixed(1);
+
+            document.getElementById("avgRatingNumber").textContent = avgRating;
+            document.getElementById("totalReviewsCount").textContent = `Based on ${totalReviews} ${totalReviews === 1 ? 'review' : 'reviews'}`;
+            
+            const fullStars = Math.round(avgRating);
+            document.getElementById("avgStars").innerHTML = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+
+            reviewsList.innerHTML = data.map(r => {
+                const rCount = Number(r.rating || 5);
+                return `
+                    <div style="border-top: 1px solid #e7dcc8; padding: 18px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="color: #f7a80c; font-size: 14px; letter-spacing: 2px;">${"★".repeat(rCount)}${"☆".repeat(5 - rCount)}</div>
+                            <span style="color: #999; font-size: 11px;">${new Date(r.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <h4 style="margin: 0 0 4px 0; font-size: 14px; color: #111;">${safeText(r.user_name)} <span style="font-size: 10px; color: #2e7d32; background: #e8f5e9; padding: 2px 6px; border-radius: 2px; margin-left: 6px;">Verified Buyer</span></h4>
+                        <p style="margin: 0; font-size: 13px; color: #555; line-height: 1.5;">${safeText(r.comment)}</p>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        async function submitReview(event) {
+            event.preventDefault();
+            const productId = getProductIdFromUrl();
+            const name = document.getElementById("reviewerName").value.trim();
+            const comment = document.getElementById("reviewText").value.trim();
+
+            if (!selectedRating) {
+                alert("Please select a star rating!");
+                return;
+            }
+
+            if (!productId) {
+                alert("Product ID missing!");
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from("reviews")
+                .insert([{
+                    product_id: productId,
+                    user_name: name,
+                    rating: selectedRating,
+                    comment: comment
+                }]);
+
+            if (error) {
+                alert("Failed to submit review. Please try again.");
+                return;
+            }
+
+            alert("Thank you! Your review has been submitted.");
+            document.getElementById("reviewForm").reset();
+            setRating(0);
+            toggleReviewForm();
+            loadReviews();
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            })[c]);
+        }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        updateCartCount();
+        fetchProductDetails();
+        loadReviews();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- ہوم پیج -->
+  <url>
+    <loc>https://faryalexclusive.vercel.app/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- پروڈکٹس والا پیج -->
+  <url>
+    <loc>https://faryalexclusive.vercel.app/product.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- کارٹ والا پیج -->
+  <url>
+    <loc>https://faryalexclusive.vercel.app/cart.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

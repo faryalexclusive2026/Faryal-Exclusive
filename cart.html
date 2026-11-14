@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Bag | FARYAL EXCLUSIVE</title>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: #fcfbfa;
+      color: #333;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    header { background: #050504; color: white; padding: 12px 4%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; }
+    .brand h1 { font-family: 'Playfair Display', serif; font-size: 16px; color: #f7a80c; letter-spacing: 1.5px; margin: 0; }
+    
+    main { max-width: 800px; margin: 20px auto; padding: 0 10px; flex: 1; width: 100%; }
+    .heading { text-align: center; margin-bottom: 20px; }
+    .heading span { color: #e79a09; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    .heading h1, .heading h2, .checkout-form h3 { font-family: 'Playfair Display', serif; }
+    .heading h1, .heading h2 { margin: 6px 0; font-size: 22px; }
+    .heading p, .note { color: #776e61; font-size: 12px; line-height: 1.5; }
+
+    .cart-area, .checkout-form { width: 100%; max-width: 100%; margin: 0 auto 25px; padding: 15px; background: #fff; border: 1px solid #e7dcc8; border-radius: 8px; }
+    
+    /* کارٹ رو اور موبائل پیکیجنگ کا بالکل پرفیکٹ سائز */
+    .cart-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eee5d8; width: 100%; }
+    .cart-row-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; overflow: hidden; }
+    .cart-row-img { width: 60px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #e7dcc8; background: #f9f5ed; flex-shrink: 0; }
+    
+    .remove { background: #fff0f0; border: 1px solid #e2a8b0; color: #f10622; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .total { text-align: right; margin-top: 15px; font-weight: 700; color: #171511; font-size: 16px; }
+    .total span { color: #8b4357; }
+
+    .btn { display: block; background: #f7a80c; color: #000; border: none; padding: 12px 10px; border-radius: 4px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; text-align: center; text-decoration: none; text-transform: uppercase; width: 100%; margin-top: 15px; box-sizing: border-box; }
+    .btn:hover { background: #e0970a; }
+
+    .checkout-form h3 { margin: 18px 0 10px; color: #252019; font-size: 16px; }
+    .checkout-form label { display: block; margin: 10px 0 5px; font-size: 12px; font-weight: 600; }
+    .checkout-form input:not([type="radio"]), .checkout-form select, .checkout-form textarea { width: 100%; padding: 10px; border: 1px solid #d8cbb8; border-radius: 4px; background: #fff; font: inherit; font-size: 13px; box-sizing: border-box; }
+    .checkout-form .payment-option { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; font-weight: normal; }
+    
+    .checkout-total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee5d8; font-size: 13px; gap: 10px; }
+    .checkout-grand-total { font-size: 16px; color: #8b4357; font-weight: 700; margin-top: 5px; }
+    
+    #easypaisaNote { margin-top: 12px; padding: 12px; background: #f8f3e9; border: 1px solid #e7dcc8; border-radius: 6px; font-size: 12px; }
+    .checkout-thankyou { margin-top: 15px; padding: 20px; text-align: center; background: #fdfaf4; border: 2px solid #b08a45; border-radius: 8px; line-height: 1.6; }
+    .checkout-thankyou h3 { color: #f7a80c; font-size: 18px; margin-bottom: 8px; }
+    
+    footer { background-color: #050504; color: #f7a80c; text-align: center; padding: 15px; font-size: 11px; letter-spacing: 0.5px; border-top: 1px solid #222; margin-top: auto; }
+
+    @media (max-width: 768px) {
+      main { padding: 0 8px; margin: 10px auto; }
+      .cart-area, .checkout-form { padding: 12px; }
+      .cart-row-img { width: 55px; height: 70px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+        <h1>FARYAL EXCLUSIVE</h1>
+    </div>
+    
+    <a href="index.html" style="background: transparent; color: #f7a80c; border: 1px solid #f7a80c; padding: 6px 12px; font-size: 10px; font-weight: 600; text-decoration: none; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s;">
+        <i class="fa-solid fa-arrow-left" style="margin-right: 4px;"></i>Continue Shopping
+    </a>
+  </header>
+
+  <main>
+    <section id="shoppingBag">
+      <div class="heading">
+        <span>YOUR SELECTION</span>
+        <h1>Shopping Bag</h1>
+        <p>Review the items you have selected.</p>
+      </div>
+
+      <div class="cart-area">
+        <div id="cartItems">
+          <p class="note">Your bag is currently empty.</p>
+        </div>
+
+        <div class="total" id="cartTotal">Total: Rs. <span>0</span></div>
+
+        <button class="btn" type="button" onclick="openCheckout()">
+          Continue to Checkout
+        </button>
+
+        <p class="note" id="cartMessage"></p>
+      </div>
+    </section>
+
+    <section id="checkoutPage" style="display:none;">
+      <div class="heading">
+        <span>FARYAL EXCLUSIVE</span>
+        <h2>Complete Your Order</h2>
+        <p>Please enter your delivery details.</p>
+      </div>
+
+      <form id="checkoutForm" class="checkout-form">
+        <h3>Customer Information</h3>
+
+        <label for="customerName">Full Name *</label>
+        <input id="customerName" name="customerName" type="text" autocomplete="name" required placeholder="Enter full name">
+
+        <label for="customerPhone">Phone Number *</label>
+        <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" placeholder="03XXXXXXXXX" required>
+
+        <label for="customerEmail">Email (Optional)</label>
+        <input id="customerEmail" name="customerEmail" type="email" autocomplete="email" placeholder="Optional">
+
+        <h3>Delivery Address</h3>
+
+        <label for="customerCountry">Country *</label>
+        <select id="customerCountry" name="customerCountry" required>
+          <option value="Pakistan" selected>Pakistan</option>
+          <option value="United Arab Emirates">United Arab Emirates</option>
+          <option value="Saudi Arabia">Saudi Arabia</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="customerRegion">Region / Province *</label>
+        <select id="customerRegion" name="customerRegion" required>
+          <option value="">Select Region</option>
+          <option>Punjab</option>
+          <option>Sindh</option>
+          <option>Khyber Pakhtunkhwa</option>
+          <option>Balochistan</option>
+          <option>Islamabad Capital Territory</option>
+          <option>Gilgit-Baltistan</option>
+          <option>Azad Jammu and Kashmir</option>
+        </select>
+
+        <label for="customerCity">City *</label>
+        <input id="customerCity" name="customerCity" type="text" required placeholder="Enter city name">
+
+        <label for="customerAddress">Complete House Address *</label>
+        <textarea id="customerAddress" name="customerAddress" rows="3" placeholder="House number, street, area and nearby landmark" required></textarea>
+
+        <h3>Order Summary</h3>
+        <div id="checkoutItems"></div>
+
+        <div class="checkout-total-row">
+          <span>Products Total</span>
+          <strong id="checkoutSubtotal">Rs. 0</strong>
+        </div>
+
+        <div class="checkout-total-row">
+          <span>Delivery Charges</span>
+          <strong>Rs. 250</strong>
+        </div>
+
+        <div class="checkout-total-row checkout-grand-total">
+          <span>Total Payable</span>
+          <strong id="checkoutTotal">Rs. 250</strong>
+        </div>
+
+        <h3>Payment Method</h3>
+
+        <label class="payment-option">
+          <input type="radio" name="paymentMethod" value="COD" checked>
+          Cash on Delivery
+        </label>
+
+        <label class="payment-option">
+          <input type="radio" name="paymentMethod" value="Easypaisa">
+          Easypaisa Online Payment
+        </label>
+
+        <div id="easypaisaNote" style="display:none;">
+          <h4>Pay via Easypaisa</h4>
+          <p style="margin: 4px 0;"><strong>Account Name:</strong> Faryal Afzal</p>
+          <p style="margin: 4px 0;"><strong>Easypaisa Number:</strong> 03353132952</p>
+          <p style="margin: 4px 0;">Please send the total payable amount and enter your transaction ID below.</p>
+
+          <label for="transactionId">Transaction ID *</label>
+          <input id="transactionId" name="transactionId" type="text" placeholder="Enter transaction ID">
+        </div>
+
+        <button type="submit" class="btn" id="placeOrderBtn">
+          Place Order
+        </button>
+      </form>
+
+      <div id="thankYouMessage" class="checkout-thankyou" style="display:none;">
+        <h3>Thank You for Shopping with Us!</h3>
+        <p>Thank you for choosing <strong>FARYAL EXCLUSIVE</strong>. Your order has been placed successfully!</p>
+        <p>We have received your order details and will deliver your order soon.</p>
+        <br>
+        <a href="index.html#products" class="btn" style="width: auto; display: inline-block;">Return to Store</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 FARYAL EXCLUSIVE | Luxury Pakistani Fashion
+  </footer>
+
+  <script>
+    const supabaseUrl = "https://iuturwbelrhwtdijuesg.supabase.co";
+    const supabaseKey = "sb_publishable_T9KQDQuceL5WH08Zr0GypA_7i9qPjSz";
+    const storeSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let cart = [];
+
+    function saveCart() {
+      localStorage.setItem("faryalExclusiveCart", JSON.stringify(cart));
+    }
+
+    function loadCart() {
+      try {
+        const savedCart = JSON.parse(localStorage.getItem("faryalExclusiveCart") || "[]");
+        cart = Array.isArray(savedCart) ? savedCart : [];
+      } catch (error) {
+        cart = [];
+      }
+      renderCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const area = document.getElementById("cartItems");
+      const totalArea = document.getElementById("cartTotal");
+
+      if (!area || !totalArea) return;
+
+      if (!cart.length) {
+        area.innerHTML = '<p class="note">Your bag is currently empty.</p>';
+        totalArea.innerHTML = "Total: Rs. <span>0</span>";
+        return;
+      }
+
+      let total = 0;
+      area.innerHTML = "";
+
+      cart.forEach((item, index) => {
+        total += Number(item.price || 0);
+
+        const row = document.createElement("div");
+        row.className = "cart-row";
+
+        const img = document.createElement("img");
+        img.className = "cart-row-img";
+        const mainImg = (item.imageUrls && item.imageUrls.find(u => u)) || item.image_url || "";
+        img.src = mainImg;
+        img.alt = item.name || "Product";
+
+        const info = document.createElement("div");
+        info.style.flex = "1";
+        info.style.minWidth = "0";
+        info.style.paddingLeft = "4px";
+
+        const selectedColorText = item.selectedColor 
+          ? `<div style="font-size:11px; color:#8b4357; font-weight:bold; margin-top:2px;">Color: ${item.selectedColor}</div>` 
+          : '';
+
+        const selectedSizeText = item.selectedSize 
+          ? `<div style="font-size:11px; color:#2b6cb0; font-weight:bold; margin-top:1px;">Size: ${item.selectedSize}</div>` 
+          : '';
+
+        info.innerHTML = `
+          <strong style="font-size:12px; color:#252019; display:block; word-wrap:break-word; line-height:1.3;">${item.name || "Product"}</strong>
+          ${selectedColorText}
+          ${selectedSizeText}
+          <div style="font-size:12px; font-weight:600; color:#8b4357; margin-top:3px;">
+            Rs. ${Number(item.price || 0).toLocaleString("en-PK")}
+          </div>
+        `;
+
+        const remove = document.createElement("button");
+        remove.className = "remove";
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.onclick = () => removeFromCart(index);
+
+        const rowLeft = document.createElement("div");
+        rowLeft.className = "cart-row-info";
+        rowLeft.append(img, info);
+
+        row.append(rowLeft, remove);
+        area.appendChild(row);
+      });
+
+      totalArea.innerHTML = "Total: Rs. <span>" + total.toLocaleString("en-PK") + "</span>";
+    }
+
+    function openCheckout() {
+      if (!cart.length) {
+        alert("Please add a product to your bag first.");
+        return;
+      }
+
+      const checkoutPage = document.getElementById("checkoutPage");
+      checkoutPage.style.display = "block";
+
+      const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+
+      document.getElementById("checkoutItems").innerHTML = "";
+
+      cart.forEach(product => {
+        const row = document.createElement("div");
+        row.className = "checkout-total-row";
+
+        const name = document.createElement("span");
+        name.style.flex = "1";
+        name.style.paddingRight = "10px";
+        const colorLabel = product.selectedColor ? ` (${product.selectedColor})` : '';
+        const sizeLabel = product.selectedSize ? ` [Size: ${product.selectedSize}]` : '';
+        name.textContent = (product.name || "Product") + colorLabel + sizeLabel;
+
+        const price = document.createElement("strong");
+        price.textContent = "Rs. " + Number(product.price || 0).toLocaleString("en-PK");
+
+        row.append(name, price);
+        document.getElementById("checkoutItems").appendChild(row);
+      });
+
+      document.getElementById("checkoutSubtotal").textContent = "Rs. " + subtotal.toLocaleString("en-PK");
+      document.getElementById("checkoutTotal").textContent = "Rs. " + (subtotal + 250).toLocaleString("en-PK");
+
+      checkoutPage.scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+      input.addEventListener("change", function () {
+        const easypaisaNote = document.getElementById("easypaisaNote");
+        const transactionId = document.getElementById("transactionId");
+        const isEasypaisa = this.value === "Easypaisa" && this.checked;
+
+        easypaisaNote.style.display = isEasypaisa ? "block" : "none";
+        transactionId.required = isEasypaisa;
+      });
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!cart.length) {
+        alert("Your bag is empty.");
+        return;
+      }
+
+      const placeBtn = document.getElementById("placeOrderBtn");
+      placeBtn.textContent = "Processing Order...";
+      placeBtn.disabled = true;
+
+      const name = document.getElementById("customerName").value.trim();
+      const phone = document.getElementById("customerPhone").value.trim();
+      const email = document.getElementById("customerEmail").value.trim();
+      const country = document.getElementById("customerCountry").value;
+      const region = document.getElementById("customerRegion").value;
+      const city = document.getElementById("customerCity").value.trim();
+      const address = document.getElementById("customerAddress").value.trim();
+
+      const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+      const grandTotal = subtotal + 250;
+
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      const transactionId = paymentMethod === "Easypaisa" ? document.getElementById("transactionId").value.trim() : "";
+
+      const orderData = {
+        customer_name: name,
+        customer_phone: phone,
+        customer_email: email,
+        country: country,
+        region: region,
+        city: city,
+        address: address,
+        payment_method: paymentMethod,
+        transaction_id: transactionId,
+        total_amount: grandTotal,
+        items: cart
+      };
+
+      const { data, error } = await storeSupabase.from("orders").insert([orderData]);
+
+      if (error) {
+        alert("Error saving order: " + error.message);
+        placeBtn.textContent = "Place Order";
+        placeBtn.disabled = false;
+        return;
+      }
+
+      cart = [];
+      saveCart();
+      renderCart();
+
+      document.getElementById("checkoutForm").style.display = "none";
+      document.getElementById("thankYouMessage").style.display = "block";
+      document.getElementById("thankYouMessage").scrollIntoView({ behavior: "smooth" });
+    });
+
+    loadCart();
+  </script>
+</body>
+</html>
