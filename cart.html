@@ -152,7 +152,7 @@
         <label for="customerAddress">Complete House Address *</label>
         <textarea id="customerAddress" name="customerAddress" rows="3" placeholder="House number, street, area and nearby landmark" required></textarea>
 
-        <h3>Order Summary</h3>
+       <h3>Order Summary</h3>
         <div id="checkoutItems"></div>
 
         <div class="checkout-total-row">
@@ -165,9 +165,14 @@
           <strong>Rs. 250</strong>
         </div>
 
+        <div class="checkout-total-row" id="codTaxRow">
+          <span>COD Tax (Govt. Fee)</span>
+          <strong id="checkoutCodTax">Rs. 100</strong>
+        </div>
+
         <div class="checkout-total-row checkout-grand-total">
           <span>Total Payable</span>
-          <strong id="checkoutTotal">Rs. 250</strong>
+          <strong id="checkoutTotal">Rs. 350</strong>
         </div>
 
         <h3>Payment Method</h3>
@@ -336,9 +341,28 @@
       });
 
       document.getElementById("checkoutSubtotal").textContent = "Rs. " + subtotal.toLocaleString("en-PK");
-      document.getElementById("checkoutTotal").textContent = "Rs. " + (subtotal + 250).toLocaleString("en-PK");
+      
+      // ڈائنامک ٹوٹل اپ ڈیٹ کال کریں
+      updateCheckoutTotals();
 
       checkoutPage.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // COD ٹیکس کے ساتھ فائنل ٹوٹل کیلकुلیٹ کرنے کا فنکشن
+    function updateCheckoutTotals() {
+      const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+      const deliveryCharges = 250;
+      
+      const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+      const isCOD = selectedPayment && selectedPayment.value === "COD";
+      const codTax = isCOD ? 100 : 0;
+
+      const grandTotal = subtotal + deliveryCharges + codTax;
+
+      const grandTotalEl = document.getElementById("checkoutTotal");
+      if (grandTotalEl) {
+        grandTotalEl.textContent = "Rs. " + grandTotal.toLocaleString("en-PK");
+      }
     }
 
     document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
@@ -347,8 +371,11 @@
         const transactionId = document.getElementById("transactionId");
         const isEasypaisa = this.value === "Easypaisa" && this.checked;
 
-        easypaisaNote.style.display = isEasypaisa ? "block" : "none";
-        transactionId.required = isEasypaisa;
+        if (easypaisaNote) easypaisaNote.style.display = isEasypaisa ? "block" : "none";
+        if (transactionId) transactionId.required = isEasypaisa;
+
+        // پیمنٹ بدلنے پر فورا ٹوٹل اور ٹیکس اپ ڈیٹ کریں
+        updateCheckoutTotals();
       });
     });
 
@@ -373,9 +400,12 @@
       const address = document.getElementById("customerAddress").value.trim();
 
       const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
-      const grandTotal = subtotal + 250;
-
+      const deliveryCharges = 250;
+      
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      const codTax = paymentMethod === "COD" ? 100 : 0;
+      const grandTotal = subtotal + deliveryCharges + codTax;
+
       const transactionId = paymentMethod === "Easypaisa" ? document.getElementById("transactionId").value.trim() : "";
 
       const orderData = {
