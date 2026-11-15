@@ -470,32 +470,32 @@
             window.location.href = 'cart.html';
         }
 
-        async function loadRelatedProducts(prod) {
+       async function loadRelatedProducts(prod) {
             const relatedGrid = document.getElementById("related-products-grid");
             const relatedSection = document.getElementById("related-products-section");
             if (!relatedGrid || !relatedSection) return;
 
-            const { data, error } = await supabaseClient
+            const currentCategory = (prod.category || "").trim();
+
+            // 1. پہلے صرف اسی کیٹیگری کی پروڈکٹس ڈیٹا بیس سے منگوائیں
+            let query = supabaseClient
                 .from('products')
                 .select('*')
-                .neq('id', prod.id)
-                .limit(8);
+                .neq('id', prod.id);
 
-            if (error || !data || data.length === 0) {
+            if (currentCategory) {
+                query = query.ilike('category', currentCategory);
+            }
+
+            let { data: matched, error } = await query.limit(4);
+
+            // 2. اگر اس کیٹیگری میں کوئی اور سوٹ نہ ہو تو سیکشن چھپا دیں
+            if (error || !matched || matched.length === 0) {
                 relatedSection.style.display = "none";
                 return;
             }
 
-            let matched = data.filter(p => (p.category || "").trim().toLowerCase() === (prod.category || "").trim().toLowerCase());
-            if (matched.length === 0) {
-                matched = data;
-            }
-
-            const displayList = matched.slice(0, 4);
-            if (displayList.length === 0) {
-                relatedSection.style.display = "none";
-                return;
-            }
+            const displayList = matched;
 
             relatedSection.style.display = "block";
 
