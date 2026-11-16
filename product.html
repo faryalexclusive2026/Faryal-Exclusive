@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" id="metaKeywords" content="Faryal Exclusive, Festive Wear, Chiffon Suits Pakistan">
     <title>Product Details - FARYAL EXCLUSIVE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -270,6 +271,15 @@
             }
 
             currentProduct = data;
+            if (currentProduct.keywords) {
+                let metaKeywordTag = document.querySelector('meta[name="keywords"]');
+                if (!metaKeywordTag) {
+                    metaKeywordTag = document.createElement('meta');
+                    metaKeywordTag.name = 'keywords';
+                    document.head.appendChild(metaKeywordTag);
+                }
+                metaKeywordTag.content = currentProduct.keywords;
+            }
             galleryImages = [];
             const paths = Array.isArray(data.images) ? data.images : [];
 
