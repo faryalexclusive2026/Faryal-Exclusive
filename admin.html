@@ -155,16 +155,19 @@ input[type=file]{display:none}
           <div class="drop">Choose a product video<br><label for="video">Browse video</label><input id="video" type="file" accept="video/*"></div>
           <div class="note" id="videoName">No video selected.</div>
         </div>
-
+       <div style="margin-bottom: 15px;">
+       <label style="display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #333;">SEO Keywords / Tags</label>
+       <input type="text" id="productKeywords" placeholder="e.g. Chiffon Suits, Festive Wear, Faryal Exclusive" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
         <div class="field">
           <label for="colors">Available Colors (comma separated)</label>
           <input id="colors" placeholder="e.g. Red, Navy Blue, Maroon, Emerald Green">
         </div>
 
        <div style="margin-bottom: 15px;">
-         <label style="display:block; font-size:13px; margin-bottom:5px; font-weight:bold;" for="sizes">Available Sizes (Comma separated, e.g. 36, 37, 38, 39)</label>
-         <input type="text" id="sizes" placeholder="36, 37, 38, 39" style="width:100%; padding:10px; border:1px solid #d8cbb8; border-radius:5px;">
-       </div>
+  <label style="display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #333;">SEO Keywords / Fabrics Tag</label>
+  <input type="text" id="productKeywords" placeholder="Shalwar Kameez, Chiffon Suits, Organza Dress, Shamoz Silk, Raw Silk, Crinkle Chiffon, Festive Wear, Luxury Pret, Faryal Exclusive" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+</div>
 
         <div class="field">
           <label for="description">Description</label>
@@ -483,9 +486,9 @@ $('form').onsubmit = async (e) => {
     stock: $('stock').value,
     colors: $('colors') ? $('colors').value.trim() : '',
     sizes: $('sizes') ? $('sizes').value.trim() : '',
-    description: $('description').value.trim()
+    description: $('description').value.trim(),
+    keywords: $('productKeywords') ? $('productKeywords').value.trim() : '' // <--- یہ نئی لائن صرف کی ورڈز کے لیے جوڑی گئی ہے
   };
-
   let targetId = editingProductId;
 
   try {
@@ -494,7 +497,7 @@ $('form').onsubmit = async (e) => {
         .from('products')
         .update(productData)
         .eq('id', editingProductId);
-
+if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
       if (updateError) throw updateError;
     } else {
       const { data: saved, error: saveError } = await supabaseClient
