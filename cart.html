@@ -309,7 +309,7 @@
       totalArea.innerHTML = "Total: Rs. <span>" + total.toLocaleString("en-PK") + "</span>";
     }
 
-    function openCheckout() {
+  function openCheckout() {
       if (!cart.length) {
         alert("Please add a product to your bag first.");
         return;
@@ -348,7 +348,7 @@
       checkoutPage.scrollIntoView({ behavior: "smooth" });
     }
 
-    // COD ٹیکس کے ساتھ فائنل ٹوٹل کیلकुلیٹ کرنے کا فنکشن
+    // COD ٹیکس کے ساتھ فائنل ٹوٹل کیلکولیٹ کرنے کا فنکشن
     function updateCheckoutTotals() {
       const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
       const deliveryCharges = 250;
@@ -408,6 +408,13 @@
 
       const transactionId = paymentMethod === "Easypaisa" ? document.getElementById("transactionId").value.trim() : "";
 
+      // پروڈکٹس کی تفصیل واٹس ایپ کے لیے تیار کرنا
+      const itemsSummary = cart.map(item => {
+        const color = item.selectedColor ? ` (${item.selectedColor})` : "";
+        const size = item.selectedSize ? ` [Size: ${item.selectedSize}]` : "";
+        return `• ${item.name}${color}${size} - Rs. ${item.price}`;
+      }).join("\n");
+
       const orderData = {
         customer_name: name,
         customer_phone: phone,
@@ -422,6 +429,7 @@
         items: cart
       };
 
+      // 1. Supabase میں آرڈر سیو کرنا (ایڈمن پینل کے لیے)
       const { data, error } = await storeSupabase.from("orders").insert([orderData]);
 
       if (error) {
@@ -431,13 +439,44 @@
         return;
       }
 
+      // 2. آپ کے واٹس ایپ نمبر پر آرڈر بھیجنے کے لیے تیار شدہ میسج
+      const myWhatsAppNumber = "923353132952"; // آپ کا واٹس ایپ نمبر
+
+      const whatsappText = 
+        `🛍️ *NEW ORDER - FARYAL EXCLUSIVE*\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📞 *Phone:* ${phone}\n` +
+        `🏙️ *City:* ${city}, ${region}\n` +
+        `📍 *Address:* ${address}\n` +
+        `💳 *Payment:* ${paymentMethod}${transactionId ? ' (TID: ' + transactionId + ')' : ''}\n\n` +
+        `👗 *Items Ordered:*\n${itemsSummary}\n\n` +
+        `💰 *Total Bill:* Rs. ${grandTotal.toLocaleString("en-PK")}`;
+
+      const encodedMsg = encodeURIComponent(whatsappText);
+      const whatsappURL = `https://wa.me/${myWhatsAppNumber}?text=${encodedMsg}`;
+
+      // کارٹ خالی کرنا
       cart = [];
       saveCart();
       renderCart();
 
+      // فارم چھپانا اور شکریہ کا پیغام دکھانا
       document.getElementById("checkoutForm").style.display = "none";
-      document.getElementById("thankYouMessage").style.display = "block";
-      document.getElementById("thankYouMessage").scrollIntoView({ behavior: "smooth" });
+      const thankYouDiv = document.getElementById("thankYouMessage");
+      thankYouDiv.style.display = "block";
+
+      // 3. شکریہ کے پیغام کے اندر واٹس ایپ کا شاندار بٹن
+      thankYouDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <h2 style="color: #27ae60; margin-bottom: 10px;">🎉 Order Placed Successfully!</h2>
+          <p style="margin-bottom: 20px;">تجارتی شکریہ! آپ کا آرڈر کامیابی سے محفوظ ہو گیا ہے۔</p>
+          <a href="${whatsappURL}" target="_blank" style="display: inline-block; background-color: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            📱 Open WhatsApp to View Order & Send to Supplier
+          </a>
+        </div>
+      `;
+
+      thankYouDiv.scrollIntoView({ behavior: "smooth" });
     });
 
     loadCart();
