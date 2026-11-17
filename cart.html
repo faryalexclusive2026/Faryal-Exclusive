@@ -309,175 +309,267 @@
       totalArea.innerHTML = "Total: Rs. <span>" + total.toLocaleString("en-PK") + "</span>";
     }
 
-  function openCheckout() {
+    function openCheckout() {
+
       if (!cart.length) {
+
         alert("Please add a product to your bag first.");
+
         return;
+
       }
 
+
+
       const checkoutPage = document.getElementById("checkoutPage");
+
       checkoutPage.style.display = "block";
 
+
+
       const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+
+
 
       document.getElementById("checkoutItems").innerHTML = "";
 
+
+
       cart.forEach(product => {
+
         const row = document.createElement("div");
+
         row.className = "checkout-total-row";
 
+
+
         const name = document.createElement("span");
+
         name.style.flex = "1";
+
         name.style.paddingRight = "10px";
+
         const colorLabel = product.selectedColor ? ` (${product.selectedColor})` : '';
+
         const sizeLabel = product.selectedSize ? ` [Size: ${product.selectedSize}]` : '';
+
         name.textContent = (product.name || "Product") + colorLabel + sizeLabel;
 
+
+
         const price = document.createElement("strong");
+
         price.textContent = "Rs. " + Number(product.price || 0).toLocaleString("en-PK");
 
+
+
         row.append(name, price);
+
         document.getElementById("checkoutItems").appendChild(row);
+
       });
+
+
 
       document.getElementById("checkoutSubtotal").textContent = "Rs. " + subtotal.toLocaleString("en-PK");
+
       
+
       // ڈائنامک ٹوٹل اپ ڈیٹ کال کریں
+
       updateCheckoutTotals();
 
+
+
       checkoutPage.scrollIntoView({ behavior: "smooth" });
+
     }
 
-    // COD ٹیکس کے ساتھ فائنل ٹوٹل کیلکولیٹ کرنے کا فنکشن
+
+
+    // COD ٹیکس کے ساتھ فائنل ٹوٹل کیلकुلیٹ کرنے کا فنکشن
+
     function updateCheckoutTotals() {
+
       const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+
       const deliveryCharges = 250;
+
       
+
       const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+
       const isCOD = selectedPayment && selectedPayment.value === "COD";
+
       const codTax = isCOD ? 100 : 0;
 
+
+
       const grandTotal = subtotal + deliveryCharges + codTax;
+
+
 
       const grandTotalEl = document.getElementById("checkoutTotal");
+
       if (grandTotalEl) {
+
         grandTotalEl.textContent = "Rs. " + grandTotal.toLocaleString("en-PK");
+
       }
+
     }
 
+
+
     document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+
       input.addEventListener("change", function () {
+
         const easypaisaNote = document.getElementById("easypaisaNote");
+
         const transactionId = document.getElementById("transactionId");
+
         const isEasypaisa = this.value === "Easypaisa" && this.checked;
 
+
+
         if (easypaisaNote) easypaisaNote.style.display = isEasypaisa ? "block" : "none";
+
         if (transactionId) transactionId.required = isEasypaisa;
 
+
+
         // پیمنٹ بدلنے پر فورا ٹوٹل اور ٹیکس اپ ڈیٹ کریں
+
         updateCheckoutTotals();
+
       });
+
     });
 
+
+
     document.getElementById("checkoutForm").addEventListener("submit", async function (event) {
+
       event.preventDefault();
 
+
+
       if (!cart.length) {
+
         alert("Your bag is empty.");
+
         return;
+
       }
 
+
+
       const placeBtn = document.getElementById("placeOrderBtn");
+
       placeBtn.textContent = "Processing Order...";
+
       placeBtn.disabled = true;
 
+
+
       const name = document.getElementById("customerName").value.trim();
+
       const phone = document.getElementById("customerPhone").value.trim();
+
       const email = document.getElementById("customerEmail").value.trim();
+
       const country = document.getElementById("customerCountry").value;
+
       const region = document.getElementById("customerRegion").value;
+
       const city = document.getElementById("customerCity").value.trim();
+
       const address = document.getElementById("customerAddress").value.trim();
 
+
+
       const subtotal = cart.reduce((sum, p) => sum + Number(p.price || 0), 0);
+
       const deliveryCharges = 250;
+
       
+
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
       const codTax = paymentMethod === "COD" ? 100 : 0;
+
       const grandTotal = subtotal + deliveryCharges + codTax;
+
+
 
       const transactionId = paymentMethod === "Easypaisa" ? document.getElementById("transactionId").value.trim() : "";
 
-      // پروڈکٹس کی تفصیل واٹس ایپ کے لیے تیار کرنا
-      const itemsSummary = cart.map(item => {
-        const color = item.selectedColor ? ` (${item.selectedColor})` : "";
-        const size = item.selectedSize ? ` [Size: ${item.selectedSize}]` : "";
-        return `• ${item.name}${color}${size} - Rs. ${item.price}`;
-      }).join("\n");
+
 
       const orderData = {
+
         customer_name: name,
+
         customer_phone: phone,
+
         customer_email: email,
+
         country: country,
+
         region: region,
+
         city: city,
+
         address: address,
+
         payment_method: paymentMethod,
+
         transaction_id: transactionId,
+
         total_amount: grandTotal,
+
         items: cart
+
       };
 
-      // 1. Supabase میں آرڈر سیو کرنا (ایڈمن پینل کے لیے)
+
+
       const { data, error } = await storeSupabase.from("orders").insert([orderData]);
 
+
+
       if (error) {
+
         alert("Error saving order: " + error.message);
+
         placeBtn.textContent = "Place Order";
+
         placeBtn.disabled = false;
+
         return;
+
       }
 
-      // 2. آپ کے واٹس ایپ نمبر پر آرڈر بھیجنے کے لیے تیار شدہ میسج
-      const myWhatsAppNumber = "923353132952"; // آپ کا واٹس ایپ نمبر
 
-      const whatsappText = 
-        `🛍️ *NEW ORDER - FARYAL EXCLUSIVE*\n\n` +
-        `👤 *Name:* ${name}\n` +
-        `📞 *Phone:* ${phone}\n` +
-        `🏙️ *City:* ${city}, ${region}\n` +
-        `📍 *Address:* ${address}\n` +
-        `💳 *Payment:* ${paymentMethod}${transactionId ? ' (TID: ' + transactionId + ')' : ''}\n\n` +
-        `👗 *Items Ordered:*\n${itemsSummary}\n\n` +
-        `💰 *Total Bill:* Rs. ${grandTotal.toLocaleString("en-PK")}`;
 
-      const encodedMsg = encodeURIComponent(whatsappText);
-      const whatsappURL = `https://wa.me/${myWhatsAppNumber}?text=${encodedMsg}`;
-
-      // کارٹ خالی کرنا
       cart = [];
+
       saveCart();
+
       renderCart();
 
-      // فارم چھپانا اور شکریہ کا پیغام دکھانا
+
+
       document.getElementById("checkoutForm").style.display = "none";
-      const thankYouDiv = document.getElementById("thankYouMessage");
-      thankYouDiv.style.display = "block";
 
-      // 3. شکریہ کے پیغام کے اندر واٹس ایپ کا شاندار بٹن
-      thankYouDiv.innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-          <h2 style="color: #27ae60; margin-bottom: 10px;">🎉 Order Placed Successfully!</h2>
-          <p style="margin-bottom: 20px;">تجارتی شکریہ! آپ کا آرڈر کامیابی سے محفوظ ہو گیا ہے۔</p>
-          <a href="${whatsappURL}" target="_blank" style="display: inline-block; background-color: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            📱 Open WhatsApp to View Order & Send to Supplier
-          </a>
-        </div>
-      `;
+      document.getElementById("thankYouMessage").style.display = "block";
 
-      thankYouDiv.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("thankYouMessage").scrollIntoView({ behavior: "smooth" });
+
     });
+
+
 
     loadCart();
   </script>
