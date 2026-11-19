@@ -5,9 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FARYAL EXCLUSIVE | Luxury Pakistani Fashion</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -298,7 +298,7 @@ nav a:hover {
     font-size: 11px !important;
     padding: 8px 2px 4px !important;
   }
-
+}
 
 </style>
 <head>
@@ -399,7 +399,7 @@ nav a:hover {
     >
   </div>
 <section class="hero" id="home">
- <img class="hero-bg" src="hero-cover.jpg" alt="Three models wearing elegant Pakistani fashion" fetchpriority="high">
+ <img class="hero-bg" src="hero-cover.jpg" alt="Three models wearing elegant Pakistani fashion" fetchpriority="high" decoding="async">
   <div class="hero-content">
     <p class="hero-tagline">FASHION • BEAUTY • LIFESTYLE</p>
     <h2 class="hero-title">Elegance in<br><span>Every Detail</span></h2>
@@ -456,15 +456,15 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterCollection('Summer Collection')">
-      <img src="summer-collection.jpg" alt="Summer Collection">
+      <img src="summer-collection.jpg" alt="Summer Collection" loading="lazy">
       <h4>Summer Collection</h4>
     </div>
     <div class="visual-card" onclick="filterCollection('Winter Collection')">
-      <img src="winter-collection.jpg" alt="Winter Collection">
+      <img src="winter-collection.jpg" alt="Winter Collection" loading="lazy">
       <h4>Winter Collection</h4>
     </div>
     <div class="visual-card" onclick="filterCollection('Festive Collection')">
-      <img src="festive-collection.jpg" alt="Festive Collection">
+      <img src="festive-collection.jpg" alt="Festive Collection" loading="lazy">
       <h4>Festive Collection</h4>
     </div>
   </div>
@@ -479,15 +479,15 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterType('Three Piece')">
-      <img src="three-piece.jpg" alt="Three Piece">
+      <img src="three-piece.jpg" alt="Three Piece" loading="lazy">
       <h4>Three Piece</h4>
     </div>
     <div class="visual-card" onclick="filterType('Two Piece')">
-      <img src="two-piece.jpg" alt="Two Piece">
+      <img src="two-piece.jpg" alt="Two Piece" loading="lazy">
       <h4>Two Piece</h4>
     </div>
     <div class="visual-card" onclick="filterType('Ready To Wear')">
-      <img src="ready-to-wear.jpg" alt="Ready To Wear">
+      <img src="ready-to-wear.jpg" alt="Ready To Wear" loading="lazy">
       <h4>Ready To Wear</h4>
     </div>
   </div>
@@ -502,23 +502,23 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterFootwearType('Heels')">
-      <img src="heels.jpg" alt="Heels">
+      <img src="heels.jpg" alt="Heels" loading="lazy">
       <h4>Heels</h4>
     </div>
     <div class="visual-card" onclick="filterFootwearType('Block Heels')">
-      <img src="block-heels.jpg" alt="Block Heels">
+      <img src="block-heels.jpg" alt="Block Heels" loading="lazy">
       <h4>Block Heels</h4>
     </div>
     <div class="visual-card" onclick="filterFootwearType('Shoes')">
-      <img src="shoes.jpg" alt="Shoes">
+      <img src="shoes.jpg" alt="Shoes" loading="lazy">
       <h4>Shoes</h4>
     </div>
     <div class="visual-card" onclick="filterFootwearType('Flats')">
-      <img src="flats.jpg" alt="Flats">
+      <img src="flats.jpg" alt="Flats" loading="lazy">
       <h4>Flats</h4>
     </div>
     <div class="visual-card" onclick="filterFootwearType('Men Shoes')">
-      <img src="men-shoes.jpg" alt="Men Shoes">
+      <img src="men-shoes.jpg" alt="Men Shoes" loading="lazy">
       <h4>Men Shoes</h4>
     </div>
   </div>
@@ -533,19 +533,19 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterAccessoriesType('Jewelry')">
-      <img src="jewelry.jpg" alt="Jewelry">
+      <img src="jewelry.jpg" alt="Jewelry" loading="lazy">
       <h4>Jewelry</h4>
     </div>
     <div class="visual-card" onclick="filterAccessoriesType('Bags & Purses')">
-      <img src="bags-purses.jpg" alt="Bags & Purses">
+      <img src="bags-purses.jpg" alt="Bags & Purses" loading="lazy">
       <h4>Bags & Purses</h4>
     </div>
     <div class="visual-card" onclick="filterAccessoriesType('Hair Accessories')">
-      <img src="hair-accessories.jpg" alt="Hair Accessories">
+      <img src="hair-accessories.jpg" alt="Hair Accessories" loading="lazy">
       <h4>Hair Accessories</h4>
     </div>
     <div class="visual-card" onclick="filterAccessoriesType('Fashion Items')">
-      <img src="fashion-items.jpg" alt="Fashion Items">
+      <img src="fashion-items.jpg" alt="Fashion Items" loading="lazy">
       <h4>Fashion Items</h4>
     </div>
   </div>
@@ -560,19 +560,19 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterMakeupType('Face Makeup')">
-      <img src="face-makeup.jpg" alt="Face Makeup">
+      <img src="face-makeup.jpg" alt="Face Makeup" loading="lazy">
       <h4>Face Makeup</h4>
     </div>
     <div class="visual-card" onclick="filterMakeupType('Eye Makeup')">
-      <img src="eye-makeup.jpg" alt="Eye Makeup">
+      <img src="eye-makeup.jpg" alt="Eye Makeup" loading="lazy">
       <h4>Eye Makeup</h4>
     </div>
     <div class="visual-card" onclick="filterMakeupType('Lips')">
-      <img src="lips.jpg" alt="Lips">
+      <img src="lips.jpg" alt="Lips" loading="lazy">
       <h4>Lips</h4>
     </div>
     <div class="visual-card" onclick="filterMakeupType('Nails')">
-      <img src="nails.jpg" alt="Nails">
+      <img src="nails.jpg" alt="Nails" loading="lazy">
       <h4>Nails</h4>
     </div>
   </div>
@@ -587,23 +587,23 @@ nav a:hover {
   </div>
   <div class="visual-grid">
     <div class="visual-card" onclick="filterSkinType('Cleansers & Face Wash')">
-      <img src="cleansers.jpg" alt="Cleansers & Face Wash">
+      <img src="cleansers.jpg" alt="Cleansers & Face Wash" loading="lazy">
       <h4>Cleansers & Face Wash</h4>
     </div>
     <div class="visual-card" onclick="filterSkinType('Serums & Toners')">
-      <img src="serums.jpg" alt="Serums & Toners">
+      <img src="serums.jpg" alt="Serums & Toners" loading="lazy">
       <h4>Serums & Toners</h4>
     </div>
     <div class="visual-card" onclick="filterSkinType('Moisturizers & Hydration')">
-      <img src="moisturizers.jpg" alt="Moisturizers & Hydration">
+      <img src="moisturizers.jpg" alt="Moisturizers & Hydration" loading="lazy">
       <h4>Moisturizers & Hydration</h4>
     </div>
     <div class="visual-card" onclick="filterSkinType('Special Care & Masks')">
-      <img src="special-care.jpg" alt="Special Care & Masks">
+      <img src="special-care.jpg" alt="Special Care & Masks" loading="lazy">
       <h4>Special Care & Masks</h4>
     </div>
     <div class="visual-card" onclick="filterSkinType('Sun Protection')">
-      <img src="sun-protection.jpg" alt="Sun Protection">
+      <img src="sun-protection.jpg" alt="Sun Protection" loading="lazy">
       <h4>Sun Protection</h4>
     </div>
   </div>
