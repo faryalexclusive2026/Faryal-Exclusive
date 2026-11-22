@@ -207,21 +207,87 @@ const $ = id => document.getElementById(id);
 let photos = [], products = [], orders = [];
 let video = null;
 let editingProductId = null;
+  
+async function shrinkImageSizeOnly(file, maxKB = 350) {
+  const maxBytes = maxKB * 1024;
+  if (file.size <= maxBytes) return file;
 
-$('photos').addEventListener('change', function () {
-  const newFiles = Array.from(this.files || []);
-  // پرانی تصاویر میں نئی تصاویر کو شامل (Append) کر رہے ہیں تاکہ وہ مٹیں نہیں
-  photos = photos.concat(newFiles);
+  const img = await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const i = new Image();
+    i.onload = () => { URL.revokeObjectURL(url); resolve(i); };
+    i.onerror = reject;
+    i.src = url;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  let quality = 0.85;
+  let blob = null;
+
+  for (let step = 0; step < 8; step++) {
+    blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+    if (blob && blob.size <= maxBytes) {
+      return blob;
+    }
+    quality = Math.max(0.25, Number((quality - 0.1).toFixed(2)));
+  }
+
+  return blob || file;
+}
+$('photos').addEventListener('change', async function () {
+  const limitKB = 350;
+  const maxBytes = limitKB * 1024;
+  const selectedFiles = Array.from(this.files || []);
+  const processedFiles = [];
+  const reducedList = [];
+  const stillLargeList = [];
+
+  $('status').textContent = 'Checking photo size...';
+
+  for (const f of selectedFiles) {
+    if (f.size > maxBytes) {
+      const oldKB = Math.round(f.size / 1024);
+      const smallerBlob = await shrinkImageSizeOnly(f, limitKB);
+      const newKB = Math.round(smallerBlob.size / 1024);
+
+      if (smallerBlob.size <= maxBytes) {
+        processedFiles.push(smallerBlob);
+        reducedList.push(`${f.name} (${oldKB} KB → ${newKB} KB)`);
+      } else {
+        stillLargeList.push(`${f.name} (${newKB} KB)`);
+      }
+    } else {
+      processedFiles.push(f);
+    }
+  }
+
+  if (reducedList.length > 0) {
+    alert(
+      'یہ تصویر/تصاویر 350 KB سے بڑی تھیں، ڈائمینشن بدلے بغیر سائز کم کر دیا گیا ہے:\n' +
+      reducedList.join('\n')
+    );
+  }
+
+  if (stillLargeList.length > 0) {
+    alert(
+      'یہ تصویر/تصاویر اب بھی 350 KB سے بڑی ہیں، براہِ کرم پہلے ان کا سائز کم کر لیں:\n' +
+      stillLargeList.join('\n')
+    );
+  }
+
+  photos = photos.concat(processedFiles);
   drawPreviews();
 
   $('status').textContent = photos.length
-    ? photos.length + ' photo(s) selected.'
+    ? photos.length + ' photo(s) ready.'
     : 'No photos selected.';
-    
-  // یہ لائن اس لیے ضروری ہے تاکہ اگر آپ دوبارہ بالکل وہی تصویر بھی سلیکٹ کرنا چاہیں تو وہ ہو سکے
+
   this.value = '';
 });
-
 $('video').addEventListener('change', function () {
   video = this.files && this.files.length
     ? this.files[0]
@@ -513,20 +579,24 @@ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
     const bucketName = 'Product';
     let uploadedPaths = [];
 
-    for (let i = 0; i < photos.length; i++) {
+  for (let i = 0; i < photos.length; i++) {
       const file = photos[i];
-      const safeName = file.name.replace(/[^\w.-]/g, '_');
-      const path = 'products/' + targetId + '/' + Date.now() + '-' + i + '-' + safeName;
+      const isCompressedJpeg = !(file instanceof File) && file.type === 'image/jpeg';
+      const cleanBase = (file.name || `photo_${i + 1}`).replace(/\.[^/.]+$/, '').replace(/[^\w.-]/g, '_');
+      const ext = isCompressedJpeg ? '.jpg' : '';
+      const path = 'products/' + targetId + '/' + Date.now() + '-' + i + '-' + cleanBase + ext;
 
       const { data, error } = await supabaseClient
         .storage
         .from(bucketName)
-        .upload(path, file, { upsert: false });
+        .upload(path, file, {
+          contentType: file.type || 'image/jpeg',
+          upsert: false
+        });
 
       if (error) throw error;
       uploadedPaths.push(data.path);
     }
-
     let videoPath = null;
     if (video) {
       const safeName = video.name.replace(/[^\w.-]/g, '_');
