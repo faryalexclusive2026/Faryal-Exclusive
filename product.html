@@ -350,7 +350,7 @@ function resolveColorValue(rawColor) {
     'silver': '#c0c0c0',
     'metallic silver': '#aaa9ad',
 
-    // Pinks, Roses & Mauves
+    // Pinks, Roses, Magentas & Mauves
     'pink': '#ffc0cb',
     'baby pink': '#f4c2c2',
     'light pink': '#ffb6c1',
@@ -368,7 +368,11 @@ function resolveColorValue(rawColor) {
     'old rose': '#c08081',
     'rose gold': '#b76e79',
     'magenta': '#e0115f',
+    'deep magenta': '#9e0059',
+    'dark magenta': '#8b005a',
+    'hot magenta': '#ff1dce',
     'fuchsia': '#d946ef',
+    'deep fuchsia': '#b5179e',
     'berry': '#8e245c',
     'mulberry': '#701c4a',
 
@@ -474,8 +478,11 @@ function resolveColorValue(rawColor) {
     return fashionColorMap[clean];
   }
 
-  // طویل اور مخصوص نام کے ٹکڑوں کو پہلے پرکھنے کے لیے اسکورنگ
   const keywordRules = [
+    { key: 'deep magenta', hex: '#9e0059', weight: 11 },
+    { key: 'dark magenta', hex: '#8b005a', weight: 11 },
+    { key: 'magenta', hex: '#e0115f', weight: 10 },
+    { key: 'fuchsia', hex: '#d946ef', weight: 10 },
     { key: 'off white', hex: '#f7f5ee', weight: 10 },
     { key: 'off-white', hex: '#f7f5ee', weight: 10 },
     { key: 'champagne', hex: '#f7e7ce', weight: 10 },
