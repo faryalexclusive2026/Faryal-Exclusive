@@ -872,7 +872,25 @@ function checkUrlParameters() {
     if (collections) collections.style.display = "block";
   }
 }
+function loadProductsWithPinnedFirst(items) {
+  return [...(items || [])].sort((a, b) => {
+    const aPinned = a.is_pinned ? 1 : 0;
+    const bPinned = b.is_pinned ? 1 : 0;
 
+    // 1. Pinned پروڈکٹس ہمیشہ پہلے
+    if (aPinned !== bPinned) return bPinned - aPinned;
+
+    // 2. اگر دونوں Pinned ہیں تو pin_order (1, 2, 3...) کے مطابق ترتیب
+    if (aPinned && bPinned) {
+      const orderA = Number(a.pin_order ?? 99);
+      const orderB = Number(b.pin_order ?? 99);
+      if (orderA !== orderB) return orderA - orderB;
+    }
+
+    // 3. باقی پروڈکٹس نئے سے پرانے (id کے حساب سے)
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+}
 async function loadStoreProducts() {
   if (!grid) return;
 
@@ -883,7 +901,6 @@ async function loadStoreProducts() {
 
   if (error) {
     console.error("Product loading error:", error);
-    // Yahan ab exact error message screen par show hoga taaki pata chal sake
     grid.innerHTML = `<p class="note" style="text-align:center; padding:30px; grid-column:1/-1; color: #8b4357; font-weight: bold;">Supabase Error: ${safeText(error.message || JSON.stringify(error))}</p>`;
     return;
   }
@@ -896,11 +913,11 @@ async function loadStoreProducts() {
 
     for (const path of paths) {
       if (!path) continue;
-      
+
       let cleanPath = path.toString().trim();
       cleanPath = cleanPath.replace(/^https?:\/\/[^\/]+\/storage\/v[0-9]\/object\/(public|sign)\/Product\//i, '');
       cleanPath = cleanPath.replace(/^\/+/, '');
-      
+
       if (cleanPath.toLowerCase().startsWith('product/')) {
         cleanPath = cleanPath.substring(8);
       }
@@ -917,15 +934,16 @@ async function loadStoreProducts() {
     storeProducts.push({ ...p, imageUrls });
   }
 
+  storeProducts = loadProductsWithPinnedFirst(storeProducts);
+
   sessionStorage.setItem('faryal_supabase_products_v9', JSON.stringify(storeProducts));
   checkUrlParameters();
   renderStoreProducts();
 }
-
 async function loadProductsFast() {
   let cachedData = sessionStorage.getItem('faryal_supabase_products_v9');
   if (cachedData) {
-    storeProducts = JSON.parse(cachedData);
+    storeProducts = loadProductsWithPinnedFirst(JSON.parse(cachedData));
     checkUrlParameters();
     renderStoreProducts();
     loadStoreProductsInBackground();
@@ -933,7 +951,6 @@ async function loadProductsFast() {
   }
   await loadStoreProducts();
 }
-
 async function loadStoreProductsInBackground() {
   try {
     const { data, error } = await storeSupabase
@@ -951,10 +968,10 @@ async function loadStoreProductsInBackground() {
       for (const path of paths) {
         if (!path) continue;
         let cleanPath = path.toString().trim();
-      
+
         cleanPath = cleanPath.replace(/^https?:\/\/[^\/]+\/storage\/v[0-9]\/object\/(public|sign)\/Product\//i, '');
         cleanPath = cleanPath.replace(/^\/+/, '');
-      
+
         if (cleanPath.toLowerCase().startsWith('product/')) {
           cleanPath = cleanPath.substring(8);
         }
@@ -971,12 +988,13 @@ async function loadStoreProductsInBackground() {
       tempProducts.push({ ...p, imageUrls });
     }
 
+    tempProducts = loadProductsWithPinnedFirst(tempProducts);
+
     sessionStorage.setItem('faryal_supabase_products_v9', JSON.stringify(tempProducts));
   } catch (err) {
     console.error("Background sync error:", err);
   }
 }
-
 function renderStoreProducts() {
   if (!grid) return;
 
