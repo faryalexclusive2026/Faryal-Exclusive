@@ -63,7 +63,8 @@
 
 @media screen and (min-width: 768px) {
     .products-grid {
-        grid-template-columns: repeat(6, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        align-items: start !important;
     }
     .container { padding: 10px; margin: 8px; gap: 12px; }
     .main-img { height: 260px; }
@@ -71,24 +72,30 @@
     .price { font-size: 16px; }
     .add-to-cart-btn { padding: 11px; font-size: 12px; }
 
-    /* ڈیسک ٹاپ پر ریلیٹڈ پروڈکٹس کی تصویر کا سر اور پیر نہ کٹنے کے لیے */
+    /* ڈیسک ٹاپ پر ریلیٹڈ پروڈکٹس کی تصویر - بغیر کٹے اور سینٹر میں */
     .products-grid .product-image {
-        height: 310px !important;
+        height: 270px !important;
+        width: 100% !important;
         background: #fdfaf5 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 6px !important;
+        padding: 4px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
     }
 
     .products-grid .product-image img {
-        width: 100% !important;
-        height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
         object-fit: contain !important;
-        object-position: top center !important;
+        object-position: center !important;
+        display: block !important;
+        margin: 0 auto !important;
     }
 }
-
         /* لائٹ باکس کا مکمل اسکرین اور سلائیڈر ویو */
         #imageModal {
             display: none;
