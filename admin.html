@@ -608,8 +608,8 @@ function editProduct(id) {
   if ($('colors')) $('colors').value = product.colors || '';
   if ($('sizes')) $('sizes').value = product.sizes || '';
   if ($('description')) $('description').value = product.description || '';
-  if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
-if ($('isPinned')) $('isPinned').checked = Boolean(product.is_pinned);
+ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
+  if ($('isPinned')) $('isPinned').checked = Boolean(product.is_pinned)'';
 if ($('pinOrder')) $('pinOrder').value = product.pin_order ?? '';
   renderExistingEditImages();
 
