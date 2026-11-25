@@ -457,23 +457,51 @@ function esc(s) {
   return String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 }
 function resolveColorValue(rawColor) {
-  const clean = String(rawColor || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const clean = String(rawColor || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_/]+/g, ' ')
+    .replace(/\s+/g, ' ');
+
   if (!clean) return '#ffffff';
 
   const fashionColorMap = {
-    // آپ کے اسکرین شاٹ اور فیشن سوٹس والے خاص 2-3 لفظی نام
-    'dusty peach pink': '#e5a99c',
-    'mauve purple': '#9b6b9e',
-    'peacock teal blue': '#006d77',
-    'deep maroon': '#5c0f1e',
+    // Whites, Creams, Beige & Nudes
+    'white': '#ffffff',
+    'pure white': '#ffffff',
+    'snow white': '#fffafa',
+    'off white': '#faf9f6',
+    'off-white': '#faf9f6',
+    'ivory': '#fffff0',
     'ivory off-white': '#f7f4eb',
-    'rose pink': '#e76f9c',
-    'ice powder blue': '#c7e3f0',
+    'ivory off white': '#f7f4eb',
+    'cream': '#fffdd0',
+    'creamy': '#fff8e7',
+    'ecru': '#f5f5dc',
+    'linen': '#faf0e6',
+    'champagne': '#f7e7ce',
+    'champagne gold': '#ebd5a7',
+    'beige': '#e8dcc4',
+    'light beige': '#f2e9d8',
+    'warm beige': '#dfd0b5',
+    'soft beige': '#ede2cf',
+    'dark beige': '#cbb896',
+    'nude beige': '#e5cbb0',
+    'sand': '#c2b280',
+    'sandstone': '#d6c7a8',
+    'oatmeal': '#dfd3c3',
+    'stone': '#b8b0a2',
+    'taupe': '#8b8589',
+    'nude': '#e3bc9a',
+    'skin': '#e8be9e',
+    'flesh': '#e8be9e',
 
     // Blacks & Greys
     'black': '#111111',
     'jet black': '#0a0a0a',
     'pitch black': '#050505',
+    'onyx': '#0f0f0f',
+    'obsidian': '#141417',
     'charcoal': '#36454f',
     'charcoal grey': '#36454f',
     'charcoal gray': '#36454f',
@@ -485,65 +513,69 @@ function resolveColorValue(rawColor) {
     'light gray': '#d3d3d3',
     'ash grey': '#b2beb5',
     'ash gray': '#b2beb5',
+    'smoke grey': '#738276',
     'slate': '#708090',
     'slate grey': '#708090',
+    'gunmetal': '#2a3439',
+    'pewter': '#8e8d8a',
     'silver': '#c0c0c0',
     'metallic silver': '#aaa9ad',
 
-    // Whites, Creams & Nudes
-    'white': '#ffffff',
-    'off white': '#faf9f6',
-    'off-white': '#faf9f6',
-    'ivory': '#fffff0',
-    'cream': '#fffdd0',
-    'beige': '#f5f5dc',
-    'nude': '#e3bc9a',
-    'skin': '#e8be9e',
-    'sand': '#c2b280',
-    'camel': '#c19a6b',
-    'khaki': '#c3b091',
-    'champagne': '#f7e7ce',
-    'linen': '#faf0e6',
-
-    // Pinks & Roses
+    // Pinks, Roses & Mauves
     'pink': '#ffc0cb',
-    'hot pink': '#ff69b4',
     'baby pink': '#f4c2c2',
     'light pink': '#ffb6c1',
+    'hot pink': '#ff69b4',
+    'bright pink': '#ff1493',
+    'rose pink': '#e76f9c',
     'dusty pink': '#d8a7b1',
+    'dusty peach pink': '#e5a99c',
     'dusty rose': '#c08081',
     'tea pink': '#e6b8b7',
-    'rose gold': '#b76e79',
     'blush': '#de5d83',
-    'magenta': '#ff00ff',
-    'fuchsia': '#ff00ff',
+    'blush pink': '#f2b8c6',
     'mauve': '#b58392',
+    'mauve purple': '#9b6b9e',
     'old rose': '#c08081',
+    'rose gold': '#b76e79',
+    'magenta': '#e0115f',
+    'fuchsia': '#d946ef',
+    'berry': '#8e245c',
+    'mulberry': '#701c4a',
 
-    // Reds, Maroons & Rusts
+    // Reds, Maroons, Burgundies & Rusts
     'red': '#d90429',
-    'bright red': '#ff0000',
+    'bright red': '#ef233c',
     'crimson': '#dc143c',
+    'scarlet': '#ff2400',
+    'ruby': '#9b111e',
     'maroon': '#800000',
+    'deep maroon': '#5c0f1e',
     'burgundy': '#800020',
     'wine': '#722f37',
+    'oxblood': '#4a0000',
     'plum': '#8e4585',
     'rust': '#b7410e',
+    'burnt rust': '#8c2d19',
     'terracotta': '#e2725b',
     'coral': '#ff7f50',
     'salmon': '#fa8072',
 
-    // Oranges, Yellows & Golds
+    // Oranges, Peaches, Yellows & Golds
     'orange': '#ff7b00',
-    'peach': '#ffdab9',
+    'burnt orange': '#cc5500',
+    'tangerine': '#f28500',
     'apricot': '#fbceb1',
+    'peach': '#ffdab9',
+    'light peach': '#ffe5cc',
     'yellow': '#ffd60a',
     'mustard': '#e1ad01',
     'mustard yellow': '#e1ad01',
+    'lemon': '#fff44f',
+    'canary': '#ffef00',
     'gold': '#d4af37',
     'golden': '#ffd700',
     'antique gold': '#c5b358',
-    'lemon': '#fff44f',
 
     // Greens
     'green': '#1b7f3e',
@@ -551,6 +583,8 @@ function resolveColorValue(rawColor) {
     'bottle green': '#006a4e',
     'emerald': '#50c878',
     'emerald green': '#50c878',
+    'forest green': '#228b22',
+    'hunter green': '#355e3b',
     'mehndi green': '#6b8e23',
     'olive': '#808000',
     'olive green': '#556b2f',
@@ -558,11 +592,11 @@ function resolveColorValue(rawColor) {
     'sage green': '#9dc183',
     'mint': '#98ff98',
     'mint green': '#98ff98',
-    'sea green': '#2e8b57',
     'pistachio': '#93c572',
+    'sea green': '#2e8b57',
     'lime': '#84cc16',
 
-    // Blues & Teals
+    // Blues, Teals & Aquas
     'blue': '#1d4ed8',
     'navy': '#000080',
     'navy blue': '#000080',
@@ -570,72 +604,88 @@ function resolveColorValue(rawColor) {
     'sky blue': '#87ceeb',
     'baby blue': '#89cff0',
     'ice blue': '#d6f1ff',
+    'ice powder blue': '#c7e3f0',
     'powder blue': '#b0e0e6',
     'teal': '#008080',
+    'peacock teal blue': '#006d77',
     'turquoise': '#40e0d0',
     'aqua': '#00ffff',
     'cyan': '#00ffff',
     'denim': '#1560bd',
+    'indigo': '#4b0082',
+    'periwinkle': '#ccccff',
 
-    // Purples & Lilacs
+    // Purples, Lilacs & Lavenders
     'purple': '#7e22ce',
     'violet': '#8f00ff',
     'lilac': '#c8a2c8',
     'lavender': '#e6e6fa',
+    'orchid': '#da70d6',
+    'amethyst': '#9966cc',
+    'eggplant': '#614051',
+    'aubergine': '#3d0814',
 
     // Browns
     'brown': '#6f4e37',
     'dark brown': '#3e2723',
     'light brown': '#a67b5b',
     'chocolate': '#7b3f00',
-    'coffee': '#6f4e37',
-    'mocha': '#967969',
     'cocoa': '#d2691e',
-    'tan': '#d2b48c'
+    'coffee': '#6f4e37',
+    'espresso': '#3c280d',
+    'mocha': '#967969',
+    'caramel': '#c68e17',
+    'toffee': '#755139',
+    'tan': '#d2b48c',
+    'chestnut': '#954535',
+    'cinnamon': '#d2691e'
   };
 
   if (fashionColorMap[clean]) {
     return fashionColorMap[clean];
   }
 
-  // اگر نام میں کوئی مشہور کلر لفظ موجود ہو تو اسی کے مطابق رنگ دینا
+  // طویل اور مخصوص نام کے ٹکڑوں کو پہلے پرکھنے کے لیے اسکورنگ
   const keywordRules = [
-    { key: 'maroon', hex: '#6e1423' },
-    { key: 'burgundy', hex: '#72182b' },
-    { key: 'crimson', hex: '#c9184a' },
-    { key: 'teal', hex: '#007777' },
-    { key: 'turquoise', hex: '#2ec4b6' },
-    { key: 'ivory', hex: '#f8f6ef' },
-    { key: 'off white', hex: '#f7f5ee' },
-    { key: 'off-white', hex: '#f7f5ee' },
-    { key: 'peach', hex: '#f4a28c' },
-    { key: 'rose', hex: '#d47a8a' },
-    { key: 'pink', hex: '#e88da8' },
-    { key: 'mauve', hex: '#9e6b8b' },
-    { key: 'purple', hex: '#7b2cbf' },
-    { key: 'lilac', hex: '#c8a2c8' },
-    { key: 'lavender', hex: '#dcd6f7' },
-    { key: 'navy', hex: '#102a54' },
-    { key: 'ice', hex: '#cce7f5' },
-    { key: 'powder', hex: '#b8d8eb' },
-    { key: 'sky', hex: '#8ecae6' },
-    { key: 'blue', hex: '#2563eb' },
-    { key: 'mehndi', hex: '#6b8e23' },
-    { key: 'olive', hex: '#6b705c' },
-    { key: 'mint', hex: '#98f5c8' },
-    { key: 'green', hex: '#1e7f43' },
-    { key: 'mustard', hex: '#d49b00' },
-    { key: 'gold', hex: '#d4af37' },
-    { key: 'yellow', hex: '#f4c430' },
-    { key: 'rust', hex: '#b7410e' },
-    { key: 'orange', hex: '#f77f00' },
-    { key: 'brown', hex: '#6f4e37' },
-    { key: 'charcoal', hex: '#36454f' },
-    { key: 'grey', hex: '#808080' },
-    { key: 'gray', hex: '#808080' },
-    { key: 'black', hex: '#111111' },
-    { key: 'white', hex: '#ffffff' }
-  ];
+    { key: 'off white', hex: '#f7f5ee', weight: 10 },
+    { key: 'off-white', hex: '#f7f5ee', weight: 10 },
+    { key: 'champagne', hex: '#f7e7ce', weight: 10 },
+    { key: 'beige', hex: '#e8dcc4', weight: 10 },
+    { key: 'ivory', hex: '#f8f6ef', weight: 9 },
+    { key: 'maroon', hex: '#6e1423', weight: 9 },
+    { key: 'burgundy', hex: '#72182b', weight: 9 },
+    { key: 'crimson', hex: '#c9184a', weight: 9 },
+    { key: 'peacock', hex: '#006d77', weight: 9 },
+    { key: 'teal', hex: '#007777', weight: 9 },
+    { key: 'turquoise', hex: '#2ec4b6', weight: 9 },
+    { key: 'mauve', hex: '#9e6b8b', weight: 9 },
+    { key: 'peach', hex: '#f4a28c', weight: 8 },
+    { key: 'rose', hex: '#d47a8a', weight: 8 },
+    { key: 'pink', hex: '#e88da8', weight: 7 },
+    { key: 'mustard', hex: '#d49b00', weight: 8 },
+    { key: 'mehndi', hex: '#6b8e23', weight: 8 },
+    { key: 'olive', hex: '#6b705c', weight: 8 },
+    { key: 'mint', hex: '#98f5c8', weight: 8 },
+    { key: 'lilac', hex: '#c8a2c8', weight: 8 },
+    { key: 'lavender', hex: '#dcd6f7', weight: 8 },
+    { key: 'purple', hex: '#7b2cbf', weight: 7 },
+    { key: 'navy', hex: '#102a54', weight: 8 },
+    { key: 'ice', hex: '#cce7f5', weight: 7 },
+    { key: 'powder', hex: '#b8d8eb', weight: 7 },
+    { key: 'sky', hex: '#8ecae6', weight: 7 },
+    { key: 'blue', hex: '#2563eb', weight: 6 },
+    { key: 'green', hex: '#1e7f43', weight: 6 },
+    { key: 'gold', hex: '#d4af37', weight: 7 },
+    { key: 'yellow', hex: '#f4c430', weight: 6 },
+    { key: 'rust', hex: '#b7410e', weight: 7 },
+    { key: 'orange', hex: '#f77f00', weight: 6 },
+    { key: 'brown', hex: '#6f4e37', weight: 6 },
+    { key: 'charcoal', hex: '#36454f', weight: 7 },
+    { key: 'grey', hex: '#808080', weight: 6 },
+    { key: 'gray', hex: '#808080', weight: 6 },
+    { key: 'black', hex: '#111111', weight: 6 },
+    { key: 'white', hex: '#ffffff', weight: 5 }
+  ].sort((a, b) => b.weight - a.weight);
 
   for (const rule of keywordRules) {
     if (clean.includes(rule.key)) {
@@ -648,7 +698,7 @@ function resolveColorValue(rawColor) {
     hash = clean.charCodeAt(i) + ((hash << 5) - hash);
   }
   const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 48%, 62%)`;
+  return `hsl(${hue}, 45%, 65%)`;
 }
  function updateColorInputPreview() {
   const input = $('colors');
