@@ -149,7 +149,12 @@ input[type=file]{display:none}
           <div class="drop">Select 3–4 photos or more<br><label for="photos">Browse photos</label><input id="photos" type="file" accept="image/*" multiple></div>
           <div class="previews" id="previews"></div>
         </div>
-
+<div id="editExistingImagesBox" style="display:none; margin:10px 0;">
+  <label style="display:block; margin-bottom:6px; font-weight:bold;">
+    Existing Product Images (کسی تصویر کو ہٹانے کے لیے × دبائیں، نئی تصویر اوپر والے Photos سے ایڈ کریں):
+  </label>
+  <div id="editExistingImagesList" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+</div>
         <div class="field">
           <label>Product video (optional)</label>
           <div class="drop">Choose a product video<br><label for="video">Browse video</label><input id="video" type="file" accept="video/*"></div>
@@ -493,25 +498,85 @@ function render() {
   });
 }
 
+let editingProductId = null;
+let existingProductImages = []; // ایڈٹ کے دوران باقی رہنے والی پرانی امیجز
+
+// پرانی امیج کے یو آر ایل سے اسٹوریج پاتھ نکالنے کا ہیلپر
+function extractStoragePath(imgValue) {
+  if (!imgValue) return '';
+  let clean = String(imgValue).trim();
+  clean = clean.replace(/^https?:\/\/[^\/]+\/storage\/v[0-9]\/object\/(public|sign)\/Product\//i, '');
+  clean = clean.replace(/^\/+/, '');
+  if (clean.toLowerCase().startsWith('product/')) {
+    clean = clean.substring(8);
+  }
+  return clean;
+}
+
+// ایڈٹ موڈ میں موجودہ امیجز دکھانے کا فنکشن
+function renderExistingEditImages() {
+  const box = $('editExistingImagesBox');
+  const list = $('editExistingImagesList');
+  if (!box || !list) return;
+
+  list.innerHTML = '';
+  if (!editingProductId || !existingProductImages.length) {
+    box.style.display = 'none';
+    return;
+  }
+
+  box.style.display = 'block';
+  existingProductImages.forEach((rawImg, idx) => {
+    const srcUrl = getValidItemImageUrl(rawImg);
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative; display:inline-block;';
+
+    const img = document.createElement('img');
+    img.src = srcUrl;
+    img.alt = 'Existing image';
+    img.style.cssText = 'width:70px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ccc;';
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.textContent = '×';
+    delBtn.title = 'Remove this image';
+    delBtn.style.cssText =
+      'position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; border:none; background:#c53030; color:#fff; cursor:pointer; font-weight:bold; line-height:1;';
+    delBtn.onclick = () => {
+      existingProductImages.splice(idx, 1);
+      renderExistingEditImages();
+    };
+
+    wrap.append(img, delBtn);
+    list.append(wrap);
+  });
+}
+
 function editProduct(id) {
   const product = products.find(p => String(p.id) === String(id));
   if (!product) return;
 
   editingProductId = product.id;
+  existingProductImages = Array.isArray(product.images) ? [...product.images] : [];
+  photos = [];
+  drawPreviews();
 
-  if ($('name'))$('name').value = product.name || '';
-  if ($('brand'))$('brand').value = product.brand || '';
-  if ($('price'))$('price').value = product.price || '';
+  if ($('name')) $('name').value = product.name || '';
+  if ($('brand')) $('brand').value = product.brand || '';
+  if ($('price')) $('price').value = product.price || '';
   if ($('category')) {
     $('category').value = product.category || '';
-$('category').dispatchEvent(new Event('change'));
+    $('category').dispatchEvent(new Event('change'));
   }
-  if ($('subCategory'))$('subCategory').value = product.subcategory || '';
-  if ($('collection'))$('collection').value = product.collection || '';
-  if ($('stock'))$('stock').value = product.stock || 'Available';
-  if ($('colors'))$('colors').value = product.colors || '';
-  if ($('sizes'))$('sizes').value = product.sizes || '';
-  if ($('description'))$('description').value = product.description || '';
+  if ($('subCategory')) $('subCategory').value = product.subcategory || '';
+  if ($('collection')) $('collection').value = product.collection || '';
+  if ($('stock')) $('stock').value = product.stock || 'Available';
+  if ($('colors')) $('colors').value = product.colors || '';
+  if ($('sizes')) $('sizes').value = product.sizes || '';
+  if ($('description')) $('description').value = product.description || '';
+  if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
+
+  renderExistingEditImages();
 
   const submitBtn = $('submitBtn');
   if (submitBtn) submitBtn.textContent = 'Update Product';
@@ -523,6 +588,8 @@ $('category').dispatchEvent(new Event('change'));
 
 function resetForm() {
   editingProductId = null;
+  existingProductImages = [];
+  renderExistingEditImages();
   $('form').reset();
   if (subCategoryField) subCategoryField.style.display = 'none';
   photos = [];
@@ -531,10 +598,11 @@ function resetForm() {
   $('videoName').textContent = 'No video selected.';
   const submitBtn = $('submitBtn');
   if (submitBtn) submitBtn.textContent = 'Save Product';
-  if ($('status'))$('status').textContent = 'Form cleared.';
+  if ($('status')) $('status').textContent = 'Form cleared.';
 }
 
-if ($('clear')) {$('clear').onclick = resetForm;
+if ($('clear')) {
+  $('clear').onclick = resetForm;
 }
 
 $('form').onsubmit = async (e) => {
@@ -553,8 +621,9 @@ $('form').onsubmit = async (e) => {
     colors: $('colors') ? $('colors').value.trim() : '',
     sizes: $('sizes') ? $('sizes').value.trim() : '',
     description: $('description').value.trim(),
-    keywords: $('productKeywords') ? $('productKeywords').value.trim() : '' // <--- یہ نئی لائن صرف کی ورڈز کے لیے جوڑی گئی ہے
+    keywords: $('productKeywords') ? $('productKeywords').value.trim() : ''
   };
+
   let targetId = editingProductId;
 
   try {
@@ -563,7 +632,7 @@ $('form').onsubmit = async (e) => {
         .from('products')
         .update(productData)
         .eq('id', editingProductId);
-if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
+
       if (updateError) throw updateError;
     } else {
       const { data: saved, error: saveError } = await supabaseClient
@@ -579,10 +648,12 @@ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
     const bucketName = 'Product';
     let uploadedPaths = [];
 
-  for (let i = 0; i < photos.length; i++) {
+    for (let i = 0; i < photos.length; i++) {
       const file = photos[i];
       const isCompressedJpeg = !(file instanceof File) && file.type === 'image/jpeg';
-      const cleanBase = (file.name || `photo_${i + 1}`).replace(/\.[^/.]+$/, '').replace(/[^\w.-]/g, '_');
+      const cleanBase = (file.name || `photo_${i + 1}`)
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[^\w.-]/g, '_');
       const ext = isCompressedJpeg ? '.jpg' : '';
       const path = 'products/' + targetId + '/' + Date.now() + '-' + i + '-' + cleanBase + ext;
 
@@ -597,6 +668,7 @@ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
       if (error) throw error;
       uploadedPaths.push(data.path);
     }
+
     let videoPath = null;
     if (video) {
       const safeName = video.name.replace(/[^\w.-]/g, '_');
@@ -612,11 +684,15 @@ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
     }
 
     const mediaUpdate = {};
-    if (uploadedPaths.length > 0) {
-      mediaUpdate.images = editingProductId
-        ? [...(products.find(p => String(p.id) === String(targetId))?.images || []), ...uploadedPaths]
-        : uploadedPaths;
+    if (editingProductId) {
+      const keptExistingPaths = existingProductImages
+        .map(extractStoragePath)
+        .filter(Boolean);
+      mediaUpdate.images = [...keptExistingPaths, ...uploadedPaths];
+    } else if (uploadedPaths.length > 0) {
+      mediaUpdate.images = uploadedPaths;
     }
+
     if (videoPath) {
       mediaUpdate.video = videoPath;
     }
@@ -630,8 +706,8 @@ if ($('productKeywords')) $('productKeywords').value = product.keywords || '';
       if (error) throw error;
     }
 
-    // کیش صاف کرنے کی کمانڈ تاکہ تازہ ڈیٹا شو ہو
     sessionStorage.removeItem('faryal_admin_products_cache');
+    sessionStorage.removeItem('faryal_admin_products_cache_v2');
 
     await loadProducts();
     status.textContent = editingProductId ? 'Product updated successfully!' : 'Product saved successfully!';
