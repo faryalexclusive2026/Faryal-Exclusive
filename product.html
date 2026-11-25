@@ -200,36 +200,42 @@ gtag('js', new Date());
         </button>
       </div>
 
-      <div id="reviewFormContainer" style="display: none; background: #fff; border: 1px solid #e7dcc8; padding: 25px; margin-bottom: 30px; border-radius: 6px;">
-        <h3 style="margin-top: 0; font-size: 16px; text-transform: uppercase; color: #8b4357; margin-bottom: 15px;">Write a Review</h3>
-        <form id="reviewForm" onsubmit="submitReview(event)">
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Name *</label>
-            <input type="text" id="reviewerName" required placeholder="Enter your name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px;">
-          </div>
+ <div id="reviewFormContainer" style="display: none; background: #fff; border: 1px solid #e7dcc8; padding: 25px; margin-bottom: 30px; border-radius: 6px;">
+  <h3 style="margin-top: 0; font-size: 16px; text-transform: uppercase; color: #8b4357; margin-bottom: 15px;">Write a Review</h3>
+  <form id="reviewForm" onsubmit="submitReview(event)">
+    <div style="margin-bottom: 12px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Name *</label>
+      <input type="text" id="reviewerName" required placeholder="Enter your name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px;">
+    </div>
 
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Rating *</label>
-            <div class="star-rating-select" style="font-size: 24px; color: #ccc; cursor: pointer; display: inline-block;">
-              <span class="star-btn" onclick="setRating(1)" style="margin-right: 2px;">★</span>
-              <span class="star-btn" onclick="setRating(2)" style="margin-right: 2px;">★</span>
-              <span class="star-btn" onclick="setRating(3)" style="margin-right: 2px;">★</span>
-              <span class="star-btn" onclick="setRating(4)" style="margin-right: 2px;">★</span>
-              <span class="star-btn" onclick="setRating(5)" style="margin-right: 2px;">★</span>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Review *</label>
-            <textarea id="reviewText" rows="3" required placeholder="Write your experience with this product..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px;"></textarea>
-          </div>
-
-          <div style="display: flex; gap: 10px;">
-            <button type="submit" style="background: #8b4357; color: white; border: none; padding: 10px 20px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">Submit Review</button>
-            <button type="button" onclick="toggleReviewForm()" style="background: transparent; color: #666; border: 1px solid #ccc; padding: 10px 15px; font-size: 12px; border-radius: 4px; cursor: pointer;">Cancel</button>
-          </div>
-        </form>
+    <div style="margin-bottom: 12px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Rating *</label>
+      <div style="display: flex; gap: 6px; font-size: 22px; cursor: pointer;">
+        <span class="star-btn" onclick="setRating(1)" style="color: #ccc;">★</span>
+        <span class="star-btn" onclick="setRating(2)" style="color: #ccc;">★</span>
+        <span class="star-btn" onclick="setRating(3)" style="color: #ccc;">★</span>
+        <span class="star-btn" onclick="setRating(4)" style="color: #ccc;">★</span>
+        <span class="star-btn" onclick="setRating(5)" style="color: #ccc;">★</span>
       </div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Upload Product Photos (Up to 2 images)</label>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <input type="file" id="reviewPhoto1" accept="image/*" onchange="handleReviewPhotosChange()" style="font-size: 12px;">
+        <input type="file" id="reviewPhoto2" accept="image/*" onchange="handleReviewPhotosChange()" style="font-size: 12px;">
+      </div>
+      <div id="reviewPhotosPreview" style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;"></div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Your Review *</label>
+      <textarea id="reviewText" rows="4" required placeholder="Share your experience with this product..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px; resize: vertical;"></textarea>
+    </div>
+
+    <button type="submit" style="background: #8b4357; color: #fff; border: none; padding: 10px 22px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer;">Submit Review</button>
+  </form>
+</div>
 
       <div id="reviewsContainer">
         <div id="reviewsList" style="margin-top: 15px;">
@@ -239,435 +245,856 @@ gtag('js', new Date());
     </section>
 
     <script>
-        const SUPABASE_URL = "https://iuturwbelrhwtdijuesg.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_T9KQDQuceL5WH08Zr0GypA_7i9qPjSz";
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = "https://iuturwbelrhwtdijuesg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_T9KQDQuceL5WH08Zr0GypA_7i9qPjSz";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let selectedColor = '';
-        let selectedSize = '';
-        let currentProduct = null;
-        let galleryImages = [];
-        let currentModalIndex = 0;
+let selectedColor = '';
+let selectedSize = '';
+let currentProduct = null;
+let galleryImages = [];
+let currentModalIndex = 0;
 
-        function updateCartCount() {
-            try {
-                const cart = JSON.parse(localStorage.getItem("faryalExclusiveCart") || "[]");
-                document.getElementById("cartCount").textContent = cart.length;
-            } catch (e) {}
-        }
+function updateCartCount() {
+  try {
+    const cart = JSON.parse(localStorage.getItem("faryalExclusiveCart") || "[]");
+    document.getElementById("cartCount").textContent = cart.length;
+  } catch (e) {}
+}
 
-        async function fetchProductDetails() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
+function resolveColorValue(rawColor) {
+  const clean = String(rawColor || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!clean) return '#ffffff';
 
-            if (!productId) {
-                document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product ID is missing in URL!</p>';
-                return;
-            }
+  const fashionColorMap = {
+    'dusty peach pink': '#e5a99c',
+    'mauve purple': '#9b6b9e',
+    'peacock teal blue': '#006d77',
+    'deep maroon': '#5c0f1e',
+    'ivory off-white': '#f7f4eb',
+    'ivory off white': '#f7f4eb',
+    'rose pink': '#e76f9c',
+    'ice powder blue': '#c7e3f0',
 
-            await loadProductFromSupabase(productId);
-        }
+    'black': '#111111',
+    'jet black': '#0a0a0a',
+    'pitch black': '#050505',
+    'charcoal': '#36454f',
+    'charcoal grey': '#36454f',
+    'charcoal gray': '#36454f',
+    'dark grey': '#4a4a4a',
+    'dark gray': '#4a4a4a',
+    'grey': '#808080',
+    'gray': '#808080',
+    'light grey': '#d3d3d3',
+    'light gray': '#d3d3d3',
+    'ash grey': '#b2beb5',
+    'ash gray': '#b2beb5',
+    'slate': '#708090',
+    'slate grey': '#708090',
+    'silver': '#c0c0c0',
+    'metallic silver': '#aaa9ad',
 
-        async function loadProductFromSupabase(productId) {
-            const { data, error } = await supabaseClient
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
+    'white': '#ffffff',
+    'off white': '#faf9f6',
+    'off-white': '#faf9f6',
+    'ivory': '#fffff0',
+    'cream': '#fffdd0',
+    'beige': '#f5f5dc',
+    'nude': '#e3bc9a',
+    'skin': '#e8be9e',
+    'sand': '#c2b280',
+    'camel': '#c19a6b',
+    'khaki': '#c3b091',
+    'champagne': '#f7e7ce',
+    'linen': '#faf0e6',
 
-            if (error || !data) {
-                console.error("Fetch Error:", error);
-                document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product not found or failed to load.</p>';
-                return;
-            }
+    'pink': '#ffc0cb',
+    'hot pink': '#ff69b4',
+    'baby pink': '#f4c2c2',
+    'light pink': '#ffb6c1',
+    'dusty pink': '#d8a7b1',
+    'dusty rose': '#c08081',
+    'tea pink': '#e6b8b7',
+    'rose gold': '#b76e79',
+    'blush': '#de5d83',
+    'magenta': '#ff00ff',
+    'fuchsia': '#ff00ff',
+    'mauve': '#b58392',
+    'old rose': '#c08081',
 
-            currentProduct = data;
-            if (currentProduct.keywords) {
-                let metaKeywordTag = document.querySelector('meta[name="keywords"]');
-                if (!metaKeywordTag) {
-                    metaKeywordTag = document.createElement('meta');
-                    metaKeywordTag.name = 'keywords';
-                    document.head.appendChild(metaKeywordTag);
-                }
-                metaKeywordTag.content = currentProduct.keywords;
-            }
-            galleryImages = [];
-            const paths = Array.isArray(data.images) ? data.images : [];
+    'red': '#d90429',
+    'bright red': '#ff0000',
+    'crimson': '#dc143c',
+    'maroon': '#800000',
+    'burgundy': '#800020',
+    'wine': '#722f37',
+    'plum': '#8e4585',
+    'rust': '#b7410e',
+    'terracotta': '#e2725b',
+    'coral': '#ff7f50',
+    'salmon': '#fa8072',
 
-            for (const path of paths) {
-                if (!path) continue;
-                let cleanPath = path.toString().trim().replace(/^\/+/, '');
-                if (cleanPath.toLowerCase().startsWith('product/')) {
-                    cleanPath = cleanPath.substring(8);
-                }
+    'orange': '#ff7b00',
+    'peach': '#ffdab9',
+    'apricot': '#fbceb1',
+    'yellow': '#ffd60a',
+    'mustard': '#e1ad01',
+    'mustard yellow': '#e1ad01',
+    'gold': '#d4af37',
+    'golden': '#ffd700',
+    'antique gold': '#c5b358',
+    'lemon': '#fff44f',
 
-                const { data: publicData } = supabaseClient
-                    .storage
-                    .from("Product")
-                    .getPublicUrl(cleanPath);
+    'green': '#1b7f3e',
+    'dark green': '#014421',
+    'bottle green': '#006a4e',
+    'emerald': '#50c878',
+    'emerald green': '#50c878',
+    'mehndi green': '#6b8e23',
+    'olive': '#808000',
+    'olive green': '#556b2f',
+    'sage': '#9dc183',
+    'sage green': '#9dc183',
+    'mint': '#98ff98',
+    'mint green': '#98ff98',
+    'sea green': '#2e8b57',
+    'pistachio': '#93c572',
+    'lime': '#84cc16',
 
-                if (publicData && publicData.publicUrl) {
-                    galleryImages.push(publicData.publicUrl);
-                }
-            }
+    'blue': '#1d4ed8',
+    'navy': '#000080',
+    'navy blue': '#000080',
+    'royal blue': '#4169e1',
+    'sky blue': '#87ceeb',
+    'baby blue': '#89cff0',
+    'ice blue': '#d6f1ff',
+    'powder blue': '#b0e0e6',
+    'teal': '#008080',
+    'turquoise': '#40e0d0',
+    'aqua': '#00ffff',
+    'cyan': '#00ffff',
+    'denim': '#1560bd',
 
-            if (galleryImages.length === 0 && data.image_url) {
-                galleryImages.push(data.image_url);
-            }
+    'purple': '#7e22ce',
+    'violet': '#8f00ff',
+    'lilac': '#c8a2c8',
+    'lavender': '#e6e6fa',
 
-            renderProduct(currentProduct);
-            loadRelatedProducts(currentProduct);
-        }
+    'brown': '#6f4e37',
+    'dark brown': '#3e2723',
+    'light brown': '#a67b5b',
+    'chocolate': '#7b3f00',
+    'coffee': '#6f4e37',
+    'mocha': '#967969',
+    'cocoa': '#d2691e',
+    'tan': '#d2b48c'
+  };
 
-        function renderProduct(prod) {
-            const mainImgUrl = galleryImages[0] || 'https://via.placeholder.com/400';
+  if (fashionColorMap[clean]) {
+    return fashionColorMap[clean];
+  }
 
-            let thumbsHtml = '';
-            galleryImages.forEach((img, index) => {
-                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active-thumb' : ''}" onclick="changeMainImg('${img}', this, ${index})">`;
-            });
+  const keywordRules = [
+    { key: 'maroon', hex: '#6e1423' },
+    { key: 'burgundy', hex: '#72182b' },
+    { key: 'crimson', hex: '#c9184a' },
+    { key: 'teal', hex: '#007777' },
+    { key: 'turquoise', hex: '#2ec4b6' },
+    { key: 'ivory', hex: '#f8f6ef' },
+    { key: 'off white', hex: '#f7f5ee' },
+    { key: 'off-white', hex: '#f7f5ee' },
+    { key: 'peach', hex: '#f4a28c' },
+    { key: 'rose', hex: '#d47a8a' },
+    { key: 'pink', hex: '#e88da8' },
+    { key: 'mauve', hex: '#9e6b8b' },
+    { key: 'purple', hex: '#7b2cbf' },
+    { key: 'lilac', hex: '#c8a2c8' },
+    { key: 'lavender', hex: '#dcd6f7' },
+    { key: 'navy', hex: '#102a54' },
+    { key: 'ice', hex: '#cce7f5' },
+    { key: 'powder', hex: '#b8d8eb' },
+    { key: 'sky', hex: '#8ecae6' },
+    { key: 'blue', hex: '#2563eb' },
+    { key: 'mehndi', hex: '#6b8e23' },
+    { key: 'olive', hex: '#6b705c' },
+    { key: 'mint', hex: '#98f5c8' },
+    { key: 'green', hex: '#1e7f43' },
+    { key: 'mustard', hex: '#d49b00' },
+    { key: 'gold', hex: '#d4af37' },
+    { key: 'yellow', hex: '#f4c430' },
+    { key: 'rust', hex: '#b7410e' },
+    { key: 'orange', hex: '#f77f00' },
+    { key: 'brown', hex: '#6f4e37' },
+    { key: 'charcoal', hex: '#36454f' },
+    { key: 'grey', hex: '#808080' },
+    { key: 'gray', hex: '#808080' },
+    { key: 'black', hex: '#111111' },
+    { key: 'white', hex: '#ffffff' }
+  ];
 
-            selectedColor = "";
-            selectedSize = "";
+  for (const rule of keywordRules) {
+    if (clean.includes(rule.key)) {
+      return rule.hex;
+    }
+  }
 
-            const colorsList = prod.colors ? prod.colors.split(',').map(c => c.trim()).filter(c => c) : [];
-            let colorsHtml = '';
-            if (colorsList.length > 0) {
-                colorsList.forEach((col) => {
-                    colorsHtml += `<div class="color-swatch" style="background-color: ${col};" onclick="selectColorOption('${col}', this)" title="${col}"></div>`;
-                });
-            }
+  let hash = 0;
+  for (let i = 0; i < clean.length; i++) {
+    hash = clean.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 48%, 62%)`;
+}
 
-            const sizesList = prod.sizes ? prod.sizes.split(',').map(s => s.trim()).filter(s => s) : [];
-            let sizesHtml = '';
-            if (sizesList.length > 0) {
-                sizesList.forEach((sz) => {
-                    sizesHtml += `<button class="opt-btn" onclick="selectSizeOption('${sz}', this)">${sz}</button>`;
-                });
-            }
+async function fetchProductDetails() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id');
 
-            document.getElementById('productContainer').innerHTML = `
-               <div class="image-section">
-                   <img src="${mainImgUrl}" id="mainImage" class="main-img" alt="Product Image" onclick="openImageModal(currentModalIndex)" style="cursor: pointer;" title="Click to view full screen">
-                   ${thumbsHtml ? `<div class="thumbnails">${thumbsHtml}</div>` : ''}
-                </div>
-                <div class="details-section">
-                    <div class="title">${prod.name || 'Luxury Product'}</div>
-                    ${prod.brand ? `<div class="brand-name">${prod.brand}</div>` : ''}
-                    <div class="price">Rs. ${Number(prod.price || 0).toLocaleString('en-PK')}</div>
-                    
-                    ${colorsHtml ? `
-                        <div class="options-title" id="colorTitleContainer">
-                            <span>Select Color:</span>
-                        </div>
-                        <div class="options-group" id="colorOptionsGroup">${colorsHtml}</div>
-                    ` : ''}
-                    
-                    ${sizesHtml ? `
-                        <div class="options-title" id="sizeTitleContainer">
-                            <span>Select Size:</span>
-                        </div>
-                        <div class="options-group" id="sizeOptionsGroup">${sizesHtml}</div>
-                    ` : ''}
+  if (!productId) {
+    document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product ID is missing in URL!</p>';
+    return;
+  }
 
-                    <button class="add-to-cart-btn" onclick="addToCart()">ADD TO BAG</button>
+  await loadProductFromSupabase(productId);
+}
 
-                    <div class="description-box">
-                        <div class="description-title">PRODUCT DETAILS</div>
-                        <div class="description">${prod.description || 'Exclusive Pakistani designer outfit crafted with premium quality fabric.'}</div>
-                    </div>
-                </div>
-            `;
-        }
+async function loadProductFromSupabase(productId) {
+  const { data, error } = await supabaseClient
+    .from('products')
+    .select('*')
+    .eq('id', productId)
+    .single();
 
-        function changeMainImg(imgUrl, el, index) {
-            currentModalIndex = index;
-            document.getElementById('mainImage').src = imgUrl;
-            document.querySelectorAll('.thumbnails img').forEach(img => img.classList.remove('active-thumb'));
-            if(el) el.classList.add('active-thumb');
-        }
+  if (error || !data) {
+    console.error("Fetch Error:", error);
+    document.getElementById('productContainer').innerHTML = '<p style="text-align:center; width:100%;">Product not found or failed to load.</p>';
+    return;
+  }
 
-        function openImageModal(index = 0) {
-            if (!galleryImages || galleryImages.length === 0) return;
-            currentModalIndex = index;
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            
-            if (modal && modalImg) {
-                modal.style.display = "flex";
-                modalImg.src = galleryImages[currentModalIndex];
-            }
-        }
+  currentProduct = data;
+  if (currentProduct.keywords) {
+    let metaKeywordTag = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywordTag) {
+      metaKeywordTag = document.createElement('meta');
+      metaKeywordTag.name = 'keywords';
+      document.head.appendChild(metaKeywordTag);
+    }
+    metaKeywordTag.content = currentProduct.keywords;
+  }
 
-        function closeImageModal() {
-            document.getElementById('imageModal').style.display = "none";
-        }
+  galleryImages = [];
+  const paths = Array.isArray(data.images) ? data.images : [];
 
-        function changeModalImage(direction) {
-            if (!galleryImages || galleryImages.length === 0) return;
-            currentModalIndex += direction;
-            
-            if (currentModalIndex >= galleryImages.length) {
-                currentModalIndex = 0;
-            } else if (currentModalIndex < 0) {
-                currentModalIndex = galleryImages.length - 1;
-            }
-            
-            const modalImg = document.getElementById('modalImage');
-            if (modalImg) {
-                modalImg.src = galleryImages[currentModalIndex];
-            }
-        }
+  for (const path of paths) {
+    if (!path) continue;
+    let cleanPath = path.toString().trim().replace(/^\/+/, '');
+    if (cleanPath.toLowerCase().startsWith('product/')) {
+      cleanPath = cleanPath.substring(8);
+    }
 
-        function selectColorOption(color, el) {
-            selectedColor = color;
-            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-            el.classList.add('active');
-            
-            const colorGroup = document.getElementById('colorOptionsGroup');
-            const colorTitle = document.getElementById('colorTitleContainer');
-            if (colorGroup) colorGroup.classList.remove('error-border');
-            if (colorTitle) {
-                const errSpan = colorTitle.querySelector('.error-text');
-                if (errSpan) errSpan.remove();
-            }
-        }
+    const { data: publicData } = supabaseClient
+      .storage
+      .from("Product")
+      .getPublicUrl(cleanPath);
 
-        function selectSizeOption(size, el) {
-            selectedSize = size;
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            
-            const sizeGroup = document.getElementById('sizeOptionsGroup');
-            const sizeTitle = document.getElementById('sizeTitleContainer');
-            if (sizeGroup) sizeGroup.classList.remove('error-border');
-            if (sizeTitle) {
-                const errSpan = sizeTitle.querySelector('.error-text');
-                if (errSpan) errSpan.remove();
-            }
-        }
+    if (publicData && publicData.publicUrl) {
+      galleryImages.push(publicData.publicUrl);
+    }
+  }
 
-        function addToCart() {
-            if (!currentProduct) return;
+  if (galleryImages.length === 0 && data.image_url) {
+    galleryImages.push(data.image_url);
+  }
 
-            let hasError = false;
-            const hasColors = currentProduct.colors && currentProduct.colors.trim().length > 0;
-            const colorGroup = document.getElementById('colorOptionsGroup');
-            const colorTitle = document.getElementById('colorTitleContainer');
+  renderProduct(currentProduct);
+  loadRelatedProducts(currentProduct);
+}
 
-            if (hasColors && !selectedColor) {
-                hasError = true;
-                if (colorGroup) colorGroup.classList.add('error-border');
-                if (colorTitle && !colorTitle.querySelector('.error-text')) {
-                    colorTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a color</span>');
-                }
-            }
+function renderProduct(prod) {
+  const mainImgUrl = galleryImages[0] || 'https://via.placeholder.com/400';
 
-            const hasSizes = currentProduct.sizes && currentProduct.sizes.trim().length > 0;
-            const sizeGroup = document.getElementById('sizeOptionsGroup');
-            const sizeTitle = document.getElementById('sizeTitleContainer');
+  let thumbsHtml = '';
+  galleryImages.forEach((img, index) => {
+    thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active-thumb' : ''}" onclick="changeMainImg('${img}', this, ${index})">`;
+  });
 
-            if (hasSizes && !selectedSize) {
-                hasError = true;
-                if (sizeGroup) sizeGroup.classList.add('error-border');
-                if (sizeTitle && !sizeTitle.querySelector('.error-text')) {
-                    sizeTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a size</span>');
-                }
-            }
+  selectedColor = "";
+  selectedSize = "";
 
-            if (hasError) return;
-
-            let cart = JSON.parse(localStorage.getItem('faryalExclusiveCart') || '[]');
-            const itemToAdd = {
-                ...currentProduct,
-                imageUrls: galleryImages,
-                selectedColor: selectedColor || 'Standard',
-                selectedSize: selectedSize || 'Standard'
-            };
-
-            cart.push(itemToAdd);
-            localStorage.setItem('faryalExclusiveCart', JSON.stringify(cart));
-            updateCartCount();
-            window.location.href = 'cart.html';
-        }
-
-       async function loadRelatedProducts(prod) {
-            const relatedGrid = document.getElementById("related-products-grid");
-            const relatedSection = document.getElementById("related-products-section");
-            if (!relatedGrid || !relatedSection) return;
-
-            const currentCategory = (prod.category || "").trim();
-
-            // 1. پہلے صرف اسی کیٹیگری کی پروڈکٹس ڈیٹا بیس سے منگوائیں
-            let query = supabaseClient
-                .from('products')
-                .select('*')
-                .neq('id', prod.id);
-
-            if (currentCategory) {
-                query = query.ilike('category', currentCategory);
-            }
-
-            let { data: matched, error } = await query.limit(4);
-
-            // 2. اگر اس کیٹیگری میں کوئی اور سوٹ نہ ہو تو سیکشن چھپا دیں
-            if (error || !matched || matched.length === 0) {
-                relatedSection.style.display = "none";
-                return;
-            }
-
-            const displayList = matched;
-
-            relatedSection.style.display = "block";
-
-            relatedGrid.innerHTML = displayList.map(p => {
-                let imgUrl = 'https://via.placeholder.com/300';
-                try {
-                    let imgs = p.images;
-                    if (typeof imgs === 'string') {
-                        try { imgs = JSON.parse(imgs); } catch(e) { imgs = [imgs]; }
-                    }
-                    const imgsArr = Array.isArray(imgs) ? imgs : [];
-                    if (imgsArr.length > 0 && imgsArr[0]) {
-                        let cleanP = imgsArr[0].toString().trim().replace(/^\/+/, '');
-                        if (cleanP.toLowerCase().startsWith('product/')) cleanP = cleanP.substring(8);
-                        const pub = supabaseClient.storage.from("Product").getPublicUrl(cleanP);
-                        if (pub && pub.data) imgUrl = pub.data.publicUrl;
-                    } else if (p.image_url) {
-                        imgUrl = p.image_url;
-                    }
-                } catch (e) {}
-
-                return `
-                  <article class="product" onclick="window.location.href='product.html?id=${p.id}'" style="cursor: pointer; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <div class="product-image" style="height: 280px; overflow: hidden; background: #fdfaf5;">
-                      <img src="${imgUrl}" alt="${safeText(p.name)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div class="product-info" style="padding: 12px; text-align: center;">
-                      <h3 style="font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #13110e;">${safeText(p.name)}</h3>
-                      <div class="price" style="font-size: 13px; font-weight: bold; color: #8b4357;">Rs. ${Number(p.price || 0).toLocaleString("en-PK")}</div>
-                    </div>
-                  </article>
-                `;
-            }).join("");
-        }
-
-        let selectedRating = 0;
-
-        function toggleReviewForm() {
-            const formContainer = document.getElementById("reviewFormContainer");
-            if (!formContainer) return;
-            formContainer.style.display = (formContainer.style.display === "none" || !formContainer.style.display) ? "block" : "none";
-            if (formContainer.style.display === "block") {
-                formContainer.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-
-        function setRating(rating) {
-            selectedRating = rating;
-            const stars = document.querySelectorAll(".star-btn");
-            stars.forEach((star, index) => {
-                star.style.color = index < rating ? "#f7a80c" : "#ccc";
-            });
-        }
-
-        function getProductIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get("id");
-        }
-
-        async function loadReviews() {
-            const productId = getProductIdFromUrl();
-            const reviewsList = document.getElementById("reviewsList");
-            if (!productId || !reviewsList) return;
-
-            const { data, error } = await supabaseClient
-                .from("reviews")
-                .select("*")
-                .eq("product_id", productId)
-                .order("created_at", { ascending: false });
-
-            if (error || !data || data.length === 0) {
-                document.getElementById("avgRatingNumber").textContent = "0.0";
-                document.getElementById("avgStars").innerHTML = "☆☆☆☆☆";
-                document.getElementById("totalReviewsCount").textContent = "Based on 0 reviews";
-                reviewsList.innerHTML = "<p style='color: #777; text-align: center; padding: 20px;'>No reviews yet. Be the first to review this product!</p>";
-                return;
-            }
-
-            const totalReviews = data.length;
-            const sumRatings = data.reduce((acc, r) => acc + Number(r.rating || 0), 0);
-            const avgRating = (sumRatings / totalReviews).toFixed(1);
-
-            document.getElementById("avgRatingNumber").textContent = avgRating;
-            document.getElementById("totalReviewsCount").textContent = `Based on ${totalReviews} ${totalReviews === 1 ? 'review' : 'reviews'}`;
-            
-            const fullStars = Math.round(avgRating);
-            document.getElementById("avgStars").innerHTML = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
-
-            reviewsList.innerHTML = data.map(r => {
-                const rCount = Number(r.rating || 5);
-                return `
-                    <div style="border-top: 1px solid #e7dcc8; padding: 18px 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <div style="color: #f7a80c; font-size: 14px; letter-spacing: 2px;">${"★".repeat(rCount)}${"☆".repeat(5 - rCount)}</div>
-                            <span style="color: #999; font-size: 11px;">${new Date(r.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <h4 style="margin: 0 0 4px 0; font-size: 14px; color: #111;">${safeText(r.user_name)} <span style="font-size: 10px; color: #2e7d32; background: #e8f5e9; padding: 2px 6px; border-radius: 2px; margin-left: 6px;">Verified Buyer</span></h4>
-                        <p style="margin: 0; font-size: 13px; color: #555; line-height: 1.5;">${safeText(r.comment)}</p>
-                    </div>
-                `;
-            }).join("");
-        }
-
-        async function submitReview(event) {
-            event.preventDefault();
-            const productId = getProductIdFromUrl();
-            const name = document.getElementById("reviewerName").value.trim();
-            const comment = document.getElementById("reviewText").value.trim();
-
-            if (!selectedRating) {
-                alert("Please select a star rating!");
-                return;
-            }
-
-            if (!productId) {
-                alert("Product ID missing!");
-                return;
-            }
-
-            const { error } = await supabaseClient
-                .from("reviews")
-                .insert([{
-                    product_id: productId,
-                    user_name: name,
-                    rating: selectedRating,
-                    comment: comment
-                }]);
-
-            if (error) {
-                alert("Failed to submit review. Please try again.");
-                return;
-            }
-
-            alert("Thank you! Your review has been submitted.");
-            document.getElementById("reviewForm").reset();
-            setRating(0);
-            toggleReviewForm();
-            loadReviews();
-        }
-
-        function safeText(value) {
-            return String(value ?? "").replace(/[&<>"']/g, c => ({
-                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-            })[c]);
-        }
-
-    window.addEventListener("DOMContentLoaded", () => {
-        updateCartCount();
-        fetchProductDetails();
-        loadReviews();
+  const colorsList = prod.colors ? prod.colors.split(',').map(c => c.trim()).filter(c => c) : [];
+  let colorsHtml = '';
+  if (colorsList.length > 0) {
+    colorsList.forEach((col) => {
+      const swatchColor = resolveColorValue(col);
+      colorsHtml += `<div class="color-swatch" style="background-color: ${safeText(swatchColor)}; border: 1px solid #bbb;" onclick="selectColorOption('${safeText(col)}', this)" title="${safeText(col)}"></div>`;
     });
-    </script>
+  }
+
+  const sizesList = prod.sizes ? prod.sizes.split(',').map(s => s.trim()).filter(s => s) : [];
+  let sizesHtml = '';
+  if (sizesList.length > 0) {
+    sizesList.forEach((sz) => {
+      sizesHtml += `<button class="opt-btn" onclick="selectSizeOption('${safeText(sz)}', this)">${safeText(sz)}</button>`;
+    });
+  }
+
+  document.getElementById('productContainer').innerHTML = `
+    <div class="image-section">
+      <img src="${mainImgUrl}" id="mainImage" class="main-img" alt="Product Image" onclick="openImageModal(currentModalIndex)" style="cursor: pointer;" title="Click to view full screen">
+      ${thumbsHtml ? `<div class="thumbnails">${thumbsHtml}</div>` : ''}
+    </div>
+    <div class="details-section">
+      <div class="title">${safeText(prod.name || 'Luxury Product')}</div>
+      ${prod.brand ? `<div class="brand-name">${safeText(prod.brand)}</div>` : ''}
+      <div class="price">Rs. ${Number(prod.price || 0).toLocaleString('en-PK')}</div>
+
+      ${colorsHtml ? `
+        <div class="options-title" id="colorTitleContainer">
+          <span>Select Color:</span>
+          <span id="selectedColorLabel" style="margin-left:8px; color:#8b4357; font-weight:600;"></span>
+        </div>
+        <div class="options-group" id="colorOptionsGroup">${colorsHtml}</div>
+      ` : ''}
+
+      ${sizesHtml ? `
+        <div class="options-title" id="sizeTitleContainer">
+          <span>Select Size:</span>
+        </div>
+        <div class="options-group" id="sizeOptionsGroup">${sizesHtml}</div>
+      ` : ''}
+
+      <button class="add-to-cart-btn" onclick="addToCart()">ADD TO BAG</button>
+
+      <div class="description-box">
+        <div class="description-title">PRODUCT DETAILS</div>
+        <div class="description">${safeText(prod.description || 'Exclusive Pakistani designer outfit crafted with premium quality fabric.')}</div>
+      </div>
+    </div>
+  `;
+}
+
+function changeMainImg(imgUrl, el, index) {
+  currentModalIndex = index;
+  document.getElementById('mainImage').src = imgUrl;
+  document.querySelectorAll('.thumbnails img').forEach(img => img.classList.remove('active-thumb'));
+  if (el) el.classList.add('active-thumb');
+}
+
+function openImageModal(index = 0) {
+  if (!galleryImages || galleryImages.length === 0) return;
+  currentModalIndex = index;
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+
+  if (modal && modalImg) {
+    modal.style.display = "flex";
+    modalImg.src = galleryImages[currentModalIndex];
+  }
+}
+
+function closeImageModal() {
+  document.getElementById('imageModal').style.display = "none";
+}
+
+function changeModalImage(direction) {
+  if (!galleryImages || galleryImages.length === 0) return;
+  currentModalIndex += direction;
+
+  if (currentModalIndex >= galleryImages.length) {
+    currentModalIndex = 0;
+  } else if (currentModalIndex < 0) {
+    currentModalIndex = galleryImages.length - 1;
+  }
+
+  const modalImg = document.getElementById('modalImage');
+  if (modalImg) {
+    modalImg.src = galleryImages[currentModalIndex];
+  }
+}
+
+function selectColorOption(color, el) {
+  selectedColor = color;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+
+  const label = document.getElementById('selectedColorLabel');
+  if (label) label.textContent = color;
+
+  const colorGroup = document.getElementById('colorOptionsGroup');
+  const colorTitle = document.getElementById('colorTitleContainer');
+  if (colorGroup) colorGroup.classList.remove('error-border');
+  if (colorTitle) {
+    const errSpan = colorTitle.querySelector('.error-text');
+    if (errSpan) errSpan.remove();
+  }
+}
+
+function selectSizeOption(size, el) {
+  selectedSize = size;
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  const sizeGroup = document.getElementById('sizeOptionsGroup');
+  const sizeTitle = document.getElementById('sizeTitleContainer');
+  if (sizeGroup) sizeGroup.classList.remove('error-border');
+  if (sizeTitle) {
+    const errSpan = sizeTitle.querySelector('.error-text');
+    if (errSpan) errSpan.remove();
+  }
+}
+
+function addToCart() {
+  if (!currentProduct) return;
+
+  let hasError = false;
+  const hasColors = currentProduct.colors && currentProduct.colors.trim().length > 0;
+  const colorGroup = document.getElementById('colorOptionsGroup');
+  const colorTitle = document.getElementById('colorTitleContainer');
+
+  if (hasColors && !selectedColor) {
+    hasError = true;
+    if (colorGroup) colorGroup.classList.add('error-border');
+    if (colorTitle && !colorTitle.querySelector('.error-text')) {
+      colorTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a color</span>');
+    }
+  }
+
+  const hasSizes = currentProduct.sizes && currentProduct.sizes.trim().length > 0;
+  const sizeGroup = document.getElementById('sizeOptionsGroup');
+  const sizeTitle = document.getElementById('sizeTitleContainer');
+
+  if (hasSizes && !selectedSize) {
+    hasError = true;
+    if (sizeGroup) sizeGroup.classList.add('error-border');
+    if (sizeTitle && !sizeTitle.querySelector('.error-text')) {
+      sizeTitle.insertAdjacentHTML('beforeend', '<span class="error-text">Please select a size</span>');
+    }
+  }
+
+  if (hasError) return;
+
+  let cart = JSON.parse(localStorage.getItem('faryalExclusiveCart') || '[]');
+  const itemToAdd = {
+    ...currentProduct,
+    imageUrls: galleryImages,
+    selectedColor: selectedColor || 'Standard',
+    selectedSize: selectedSize || 'Standard'
+  };
+
+  cart.push(itemToAdd);
+  localStorage.setItem('faryalExclusiveCart', JSON.stringify(cart));
+  updateCartCount();
+  window.location.href = 'cart.html';
+}
+
+async function loadRelatedProducts(prod) {
+  const relatedGrid = document.getElementById("related-products-grid");
+  const relatedSection = document.getElementById("related-products-section");
+  if (!relatedGrid || !relatedSection) return;
+
+  const currentCategory = (prod.category || "").trim().toLowerCase();
+  const currentCollection = (prod.collection || "").trim().toLowerCase();
+  const currentSubcategory = (prod.subcategory || "").trim().toLowerCase();
+
+  if (!currentCategory) {
+    relatedSection.style.display = "none";
+    return;
+  }
+
+  const { data: matched, error } = await supabaseClient
+    .from('products')
+    .select('*')
+    .neq('id', prod.id)
+    .ilike('category', prod.category.trim());
+
+  if (error || !matched || matched.length === 0) {
+    relatedSection.style.display = "none";
+    return;
+  }
+
+  const sameCategoryItems = matched.filter(
+    p => (p.category || "").trim().toLowerCase() === currentCategory
+  );
+
+  // 1. پہلے اسی کیٹگری اور اسی کلیکشن والے پروڈکٹس
+  const exactCategoryAndCollection = sameCategoryItems.filter(
+    p => currentCollection && (p.collection || "").trim().toLowerCase() === currentCollection
+  );
+
+  // 2. پھر اسی کیٹگری کے باقی پروڈکٹس (جو اس کلیکشن میں نہیں آئے)
+  const otherInSameCategory = sameCategoryItems.filter(
+    p => !(currentCollection && (p.collection || "").trim().toLowerCase() === currentCollection)
+  );
+
+  const sortGroup = (list) => [...list].sort((a, b) => {
+    const aSub = currentSubcategory && (a.subcategory || "").trim().toLowerCase() === currentSubcategory ? 1 : 0;
+    const bSub = currentSubcategory && (b.subcategory || "").trim().toLowerCase() === currentSubcategory ? 1 : 0;
+    if (aSub !== bSub) return bSub - aSub;
+
+    const aPin = a.is_pinned ? 1 : 0;
+    const bPin = b.is_pinned ? 1 : 0;
+    if (aPin !== bPin) return bPin - aPin;
+
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+
+  const orderedRelated = [
+    ...sortGroup(exactCategoryAndCollection),
+    ...sortGroup(otherInSameCategory)
+  ];
+
+  const displayList = orderedRelated.slice(0, 4);
+
+  if (!displayList.length) {
+    relatedSection.style.display = "none";
+    return;
+  }
+
+  relatedSection.style.display = "block";
+
+  relatedGrid.innerHTML = displayList.map(p => {
+    let imgUrl = 'https://via.placeholder.com/300';
+    try {
+      let imgs = p.images;
+      if (typeof imgs === 'string') {
+        try { imgs = JSON.parse(imgs); } catch (e) { imgs = [imgs]; }
+      }
+      const imgsArr = Array.isArray(imgs) ? imgs : [];
+      if (imgsArr.length > 0 && imgsArr[0]) {
+        let cleanP = imgsArr[0].toString().trim().replace(/^\/+/, '');
+        if (cleanP.toLowerCase().startsWith('product/')) cleanP = cleanP.substring(8);
+        const pub = supabaseClient.storage.from("Product").getPublicUrl(cleanP);
+        if (pub && pub.data) imgUrl = pub.data.publicUrl;
+      } else if (p.image_url) {
+        imgUrl = p.image_url;
+      }
+    } catch (e) {}
+
+    return `
+      <article class="product" onclick="window.location.href='product.html?id=${p.id}'" style="cursor: pointer; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <div class="product-image" style="height: 280px; overflow: hidden; background: #fdfaf5;">
+          <img src="${imgUrl}" alt="${safeText(p.name)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="product-info" style="padding: 12px; text-align: center;">
+          <h3 style="font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #13110e;">${safeText(p.name)}</h3>
+          <div class="price" style="font-size: 13px; font-weight: bold; color: #8b4357;">Rs. ${Number(p.price || 0).toLocaleString("en-PK")}</div>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+let selectedRating = 0;
+let reviewImageFiles = [];
+
+function toggleReviewForm() {
+  const formContainer = document.getElementById("reviewFormContainer");
+  if (!formContainer) return;
+  formContainer.style.display = (formContainer.style.display === "none" || !formContainer.style.display) ? "block" : "none";
+  if (formContainer.style.display === "block") {
+    formContainer.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+function setRating(rating) {
+  selectedRating = rating;
+  const stars = document.querySelectorAll(".star-btn");
+  stars.forEach((star, index) => {
+    star.style.color = index < rating ? "#f7a80c" : "#ccc";
+  });
+}
+
+function getProductIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("id");
+}
+
+async function compressReviewImageTo150KB(file, maxKB = 150) {
+  const maxBytes = maxKB * 1024;
+  if (!file) return null;
+
+  if (file.size <= maxBytes && file.type && file.type.startsWith("image/")) {
+    return file;
+  }
+
+  const img = await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const i = new Image();
+    i.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(i);
+    };
+    i.onerror = (err) => {
+      URL.revokeObjectURL(url);
+      reject(err);
+    };
+    i.src = url;
+  });
+
+  const maxDimension = 1280;
+  let targetW = img.width || 800;
+  let targetH = img.height || 800;
+
+  if (targetW > maxDimension || targetH > maxDimension) {
+    if (targetW >= targetH) {
+      targetH = Math.round((targetH * maxDimension) / targetW);
+      targetW = maxDimension;
+    } else {
+      targetW = Math.round((targetW * maxDimension) / targetH);
+      targetH = maxDimension;
+    }
+  }
+
+  let bestBlob = null;
+
+  for (let scalePass = 0; scalePass < 4; scalePass++) {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(200, targetW);
+    canvas.height = Math.max(200, targetH);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    let quality = 0.82;
+    for (let step = 0; step < 8; step++) {
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality)
+      );
+      if (blob) {
+        bestBlob = blob;
+        if (blob.size <= maxBytes) {
+          return blob;
+        }
+      }
+      quality = Math.max(0.2, Number((quality - 0.1).toFixed(2)));
+    }
+
+    targetW = Math.round(targetW * 0.8);
+    targetH = Math.round(targetH * 0.8);
+  }
+
+  return bestBlob || file;
+}
+
+async function handleReviewPhotosChange() {
+  const p1 = document.getElementById("reviewPhoto1");
+  const p2 = document.getElementById("reviewPhoto2");
+  const previewBox = document.getElementById("reviewPhotosPreview");
+
+  const chosen = [];
+  if (p1 && p1.files && p1.files[0]) chosen.push(p1.files[0]);
+  if (p2 && p2.files && p2.files[0]) chosen.push(p2.files[0]);
+
+  const limited = chosen.slice(0, 2);
+  const compressedList = [];
+
+  for (const file of limited) {
+    try {
+      const compressed = await compressReviewImageTo150KB(file, 150);
+      compressedList.push(compressed || file);
+    } catch (e) {
+      compressedList.push(file);
+    }
+  }
+
+  reviewImageFiles = compressedList;
+
+  if (previewBox) {
+    previewBox.innerHTML = reviewImageFiles.map((item) => {
+      const tempUrl = URL.createObjectURL(item);
+      return `<img src="${tempUrl}" alt="Review preview" style="width:64px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">`;
+    }).join("");
+  }
+}
+
+async function uploadReviewImages(productId) {
+  const uploadedUrls = [];
+  const bucketName = "Product";
+
+  for (let i = 0; i < Math.min(reviewImageFiles.length, 2); i++) {
+    let file = reviewImageFiles[i];
+    if (!file) continue;
+
+    if ((file.size || 0) > 150 * 1024) {
+      try {
+        file = (await compressReviewImageTo150KB(file, 150)) || file;
+      } catch (e) {}
+    }
+
+    const safeName = (file.name || `review_${i + 1}`)
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[^\w.-]/g, "_");
+    const ext = file.type === "image/png" ? ".png" : file.type === "image/webp" ? ".webp" : ".jpg";
+    const storagePath = `reviews/${productId}/${Date.now()}-${i + 1}-${safeName}${ext}`;
+
+    const { data, error } = await supabaseClient
+      .storage
+      .from(bucketName)
+      .upload(storagePath, file, {
+        contentType: file.type || "image/jpeg",
+        upsert: false
+      });
+
+    if (!error && data && data.path) {
+      const { data: pubData } = supabaseClient
+        .storage
+        .from(bucketName)
+        .getPublicUrl(data.path);
+
+      if (pubData && pubData.publicUrl) {
+        uploadedUrls.push(pubData.publicUrl);
+      }
+    }
+  }
+
+  return uploadedUrls;
+}
+
+async function loadReviews() {
+  const productId = getProductIdFromUrl();
+  const reviewsList = document.getElementById("reviewsList");
+  if (!productId || !reviewsList) return;
+
+  const { data, error } = await supabaseClient
+    .from("reviews")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    document.getElementById("avgRatingNumber").textContent = "0.0";
+    document.getElementById("avgStars").innerHTML = "☆☆☆☆☆";
+    document.getElementById("totalReviewsCount").textContent = "Based on 0 reviews";
+    reviewsList.innerHTML = "<p style='color: #777; text-align: center; padding: 20px;'>No reviews yet. Be the first to review this product!</p>";
+    return;
+  }
+
+  const totalReviews = data.length;
+  const sumRatings = data.reduce((acc, r) => acc + Number(r.rating || 0), 0);
+  const avgRating = (sumRatings / totalReviews).toFixed(1);
+
+  document.getElementById("avgRatingNumber").textContent = avgRating;
+  document.getElementById("totalReviewsCount").textContent = `Based on ${totalReviews} ${totalReviews === 1 ? 'review' : 'reviews'}`;
+
+  const fullStars = Math.round(avgRating);
+  document.getElementById("avgStars").innerHTML = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+
+  reviewsList.innerHTML = data.map((r) => {
+    const rCount = Number(r.rating || 5);
+    let imgs = [];
+    if (Array.isArray(r.images)) {
+      imgs = r.images.slice(0, 2);
+    } else if (typeof r.images === "string" && r.images.trim()) {
+      try {
+        const parsed = JSON.parse(r.images);
+        if (Array.isArray(parsed)) imgs = parsed.slice(0, 2);
+      } catch (e) {
+        imgs = r.images.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 2);
+      }
+    }
+
+    const reviewImgsHtml = imgs.length > 0
+      ? `<div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+          ${imgs.map((imgUrl) => `
+            <img src="${safeText(imgUrl)}" alt="Customer review photo" onclick="openReviewPhotoModal('${safeText(imgUrl)}')" style="width:72px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #e2d8c5; cursor:pointer;">
+          `).join("")}
+         </div>`
+      : "";
+
+    return `
+      <div style="border-top: 1px solid #e7dcc8; padding: 18px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="color: #f7a80c; font-size: 14px; letter-spacing: 2px;">${"★".repeat(rCount)}${"☆".repeat(5 - rCount)}</div>
+          <span style="color: #999; font-size: 11px;">${new Date(r.created_at).toLocaleDateString()}</span>
+        </div>
+        <h4 style="margin: 0 0 4px 0; font-size: 14px; color: #111;">${safeText(r.user_name)} <span style="font-size: 10px; color: #2e7d32; background: #e8f5e9; padding: 2px 6px; border-radius: 2px; margin-left: 6px;">Verified Buyer</span></h4>
+        <p style="margin: 0; font-size: 13px; color: #555; line-height: 1.5;">${safeText(r.comment)}</p>
+        ${reviewImgsHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+function openReviewPhotoModal(imgUrl) {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImage");
+  if (modal && modalImg && imgUrl) {
+    modal.style.display = "flex";
+    modalImg.src = imgUrl;
+  }
+}
+
+async function submitReview(event) {
+  event.preventDefault();
+  const productId = getProductIdFromUrl();
+  const name = document.getElementById("reviewerName").value.trim();
+  const comment = document.getElementById("reviewText").value.trim();
+
+  if (!selectedRating) {
+    alert("Please select a star rating!");
+    return;
+  }
+
+  if (!productId) {
+    alert("Product ID missing!");
+    return;
+  }
+
+  const uploadedImageUrls = await uploadReviewImages(productId);
+
+  const payloadWithImages = {
+    product_id: productId,
+    user_name: name,
+    rating: selectedRating,
+    comment: comment,
+    images: uploadedImageUrls
+  };
+
+  let { error } = await supabaseClient
+    .from("reviews")
+    .insert([payloadWithImages]);
+
+  if (error && /column.*images/i.test(error.message || "")) {
+    const fallbackRes = await supabaseClient
+      .from("reviews")
+      .insert([{
+        product_id: productId,
+        user_name: name,
+        rating: selectedRating,
+        comment: comment
+      }]);
+    error = fallbackRes.error;
+  }
+
+  if (error) {
+    alert("Failed to submit review. Please try again.");
+    return;
+  }
+
+  alert("Thank you! Your review has been submitted.");
+  document.getElementById("reviewForm").reset();
+  const p1 = document.getElementById("reviewPhoto1");
+  const p2 = document.getElementById("reviewPhoto2");
+  const previewBox = document.getElementById("reviewPhotosPreview");
+  if (p1) p1.value = "";
+  if (p2) p2.value = "";
+  if (previewBox) previewBox.innerHTML = "";
+  reviewImageFiles = [];
+  setRating(0);
+  toggleReviewForm();
+  loadReviews();
+}
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  updateCartCount();
+  fetchProductDetails();
+  loadReviews();
+});
+</script>
 </body>
 </html>
