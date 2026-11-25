@@ -461,6 +461,15 @@ function resolveColorValue(rawColor) {
   if (!clean) return '#ffffff';
 
   const fashionColorMap = {
+    // آپ کے اسکرین شاٹ اور فیشن سوٹس والے خاص 2-3 لفظی نام
+    'dusty peach pink': '#e5a99c',
+    'mauve purple': '#9b6b9e',
+    'peacock teal blue': '#006d77',
+    'deep maroon': '#5c0f1e',
+    'ivory off-white': '#f7f4eb',
+    'rose pink': '#e76f9c',
+    'ice powder blue': '#c7e3f0',
+
     // Blacks & Greys
     'black': '#111111',
     'jet black': '#0a0a0a',
@@ -499,7 +508,6 @@ function resolveColorValue(rawColor) {
     // Pinks & Roses
     'pink': '#ffc0cb',
     'hot pink': '#ff69b4',
-    'rose pink': '#ff66cc',
     'baby pink': '#f4c2c2',
     'light pink': '#ffb6c1',
     'dusty pink': '#d8a7b1',
@@ -509,7 +517,7 @@ function resolveColorValue(rawColor) {
     'blush': '#de5d83',
     'magenta': '#ff00ff',
     'fuchsia': '#ff00ff',
-    'mauve': '#e0b0ff',
+    'mauve': '#b58392',
     'old rose': '#c08081',
 
     // Reds, Maroons & Rusts
@@ -562,11 +570,11 @@ function resolveColorValue(rawColor) {
     'sky blue': '#87ceeb',
     'baby blue': '#89cff0',
     'ice blue': '#d6f1ff',
+    'powder blue': '#b0e0e6',
     'teal': '#008080',
     'turquoise': '#40e0d0',
     'aqua': '#00ffff',
     'cyan': '#00ffff',
-    'powder blue': '#b0e0e6',
     'denim': '#1560bd',
 
     // Purples & Lilacs
@@ -590,7 +598,51 @@ function resolveColorValue(rawColor) {
     return fashionColorMap[clean];
   }
 
-  // باقی تمام ناموں کے لیے خودکار رنگین باکس تیار کرنا
+  // اگر نام میں کوئی مشہور کلر لفظ موجود ہو تو اسی کے مطابق رنگ دینا
+  const keywordRules = [
+    { key: 'maroon', hex: '#6e1423' },
+    { key: 'burgundy', hex: '#72182b' },
+    { key: 'crimson', hex: '#c9184a' },
+    { key: 'teal', hex: '#007777' },
+    { key: 'turquoise', hex: '#2ec4b6' },
+    { key: 'ivory', hex: '#f8f6ef' },
+    { key: 'off white', hex: '#f7f5ee' },
+    { key: 'off-white', hex: '#f7f5ee' },
+    { key: 'peach', hex: '#f4a28c' },
+    { key: 'rose', hex: '#d47a8a' },
+    { key: 'pink', hex: '#e88da8' },
+    { key: 'mauve', hex: '#9e6b8b' },
+    { key: 'purple', hex: '#7b2cbf' },
+    { key: 'lilac', hex: '#c8a2c8' },
+    { key: 'lavender', hex: '#dcd6f7' },
+    { key: 'navy', hex: '#102a54' },
+    { key: 'ice', hex: '#cce7f5' },
+    { key: 'powder', hex: '#b8d8eb' },
+    { key: 'sky', hex: '#8ecae6' },
+    { key: 'blue', hex: '#2563eb' },
+    { key: 'mehndi', hex: '#6b8e23' },
+    { key: 'olive', hex: '#6b705c' },
+    { key: 'mint', hex: '#98f5c8' },
+    { key: 'green', hex: '#1e7f43' },
+    { key: 'mustard', hex: '#d49b00' },
+    { key: 'gold', hex: '#d4af37' },
+    { key: 'yellow', hex: '#f4c430' },
+    { key: 'rust', hex: '#b7410e' },
+    { key: 'orange', hex: '#f77f00' },
+    { key: 'brown', hex: '#6f4e37' },
+    { key: 'charcoal', hex: '#36454f' },
+    { key: 'grey', hex: '#808080' },
+    { key: 'gray', hex: '#808080' },
+    { key: 'black', hex: '#111111' },
+    { key: 'white', hex: '#ffffff' }
+  ];
+
+  for (const rule of keywordRules) {
+    if (clean.includes(rule.key)) {
+      return rule.hex;
+    }
+  }
+
   let hash = 0;
   for (let i = 0; i < clean.length; i++) {
     hash = clean.charCodeAt(i) + ((hash << 5) - hash);
