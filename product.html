@@ -596,8 +596,112 @@ async function loadProductFromSupabase(productId) {
     galleryImages.push(data.image_url);
   }
 
-  renderProduct(currentProduct);
-  loadRelatedProducts(currentProduct);
+  updateProductSEO(currentProduct, galleryImages);
+
+renderProduct(currentProduct);
+loadRelatedProducts(currentProduct);
+}
+
+function updateProductSEO(prod, images = []) {
+  const productName = (prod.name || "Pakistani Fashion").trim();
+  const brand = (prod.brand || "Faryal Exclusive").trim();
+  const description = (
+    prod.description ||
+    `${productName} – Shop Pakistani fashion online at Faryal Exclusive.`
+  ).trim();
+
+  const price = Number(prod.price);
+  const productUrl =
+    window.location.origin +
+    window.location.pathname +
+    "?id=" + encodeURIComponent(prod.id);
+
+  const imageList = images.filter(Boolean);
+
+  // Browser title
+  document.title = `${productName} | ${brand} | Faryal Exclusive`;
+
+  // Meta description
+  let metaDescription = document.querySelector('meta[name="description"]');
+  if (!metaDescription) {
+    metaDescription = document.createElement("meta");
+    metaDescription.name = "description";
+    document.head.appendChild(metaDescription);
+  }
+  metaDescription.content = description.slice(0, 160);
+
+  // Canonical URL
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.rel = "canonical";
+    document.head.appendChild(canonical);
+  }
+  canonical.href = productUrl;
+
+  // Open Graph information
+  function setMeta(property, content) {
+    let tag = document.querySelector(`meta[property="${property}"]`);
+    if (!tag) {
+      tag = document.createElement("meta");
+      tag.setAttribute("property", property);
+      document.head.appendChild(tag);
+    }
+    tag.content = content;
+  }
+
+  setMeta("og:title", document.title);
+  setMeta("og:description", description.slice(0, 160));
+  setMeta("og:url", productUrl);
+
+  if (imageList.length) {
+    setMeta("og:image", imageList[0]);
+  }
+
+  // Product Schema
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": productName,
+    "description": description,
+    "url": productUrl,
+    "brand": {
+      "@type": "Brand",
+      "name": brand
+    },
+    "image": imageList
+  };
+
+  if (price > 0 && Number.isFinite(price)) {
+    const offer = {
+      "@type": "Offer",
+      "url": productUrl,
+      "priceCurrency": "PKR",
+      "price": price
+    };
+
+    const stock = (prod.stock || "").trim().toLowerCase();
+
+    if (stock === "available") {
+      offer.availability = "https://schema.org/InStock";
+    } else if (stock === "limited stock") {
+      offer.availability = "https://schema.org/LimitedAvailability";
+    } else if (stock === "out of stock") {
+      offer.availability = "https://schema.org/OutOfStock";
+    }
+
+    productSchema.offers = offer;
+  }
+
+  let schemaTag = document.getElementById("product-jsonld");
+  if (!schemaTag) {
+    schemaTag = document.createElement("script");
+    schemaTag.type = "application/ld+json";
+    schemaTag.id = "product-jsonld";
+    document.head.appendChild(schemaTag);
+  }
+
+  schemaTag.textContent = JSON.stringify(productSchema);
 }
 
 function renderProduct(prod) {
