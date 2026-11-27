@@ -560,8 +560,22 @@ gtag('js', new Date());
         return;
 
       }
+const orderRef = transactionId || ("ORD-" + Date.now());
+      const purchasedItems = cart.map(item => ({
+        item_name: item.name || "Product",
+        item_variant: [item.selectedColor, item.selectedSize].filter(Boolean).join(" / "),
+        price: Number(item.price || 0),
+        quantity: 1
+      }));
 
-
+      if (typeof gtag === "function") {
+        gtag("event", "purchase", {
+          transaction_id: orderRef,
+          value: Number(grandTotal) || 0,
+          currency: "PKR",
+          items: purchasedItems
+        });
+      }
 
       cart = [];
 
